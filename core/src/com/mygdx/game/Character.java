@@ -14,8 +14,11 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class Character extends Group {
     private boolean isSelected;
     Image character,selection,characterProjection;
-
     public long startTime;
+
+    public final int maxAction=1000;
+    public int action=0;
+
     public Character(){
         character = new Image(new Texture(Gdx.files.internal("character.png")));
         selection = new Image(new Texture(Gdx.files.internal("selection.png")));
@@ -47,17 +50,23 @@ public class Character extends Group {
             Vector2 ch = new Vector2(
                     getX() + getWidth() / 2,
                     getY() + getHeight() / 2);
-
-            if (cursor.dst(ch) > 20 && Math.abs(startTime-TimeUtils.millis())>100) {
+            if (cursor.dst(ch) > 20 && Math.abs(startTime - TimeUtils.millis())>100) {
                 Vector2 direction = cursor.cpy().sub(ch);
                 if (direction.len() > Projection.lineMaxLength) {
                     direction.setLength(Projection.lineMaxLength);
-                    cursor.set(ch.cpy().add(direction));
                 }
+                if (action + direction.len() <= maxAction) {
+                    action += direction.len();
+                } else {
+                    direction.setLength(maxAction - action);
+                    action=maxAction;
+                }
+                cursor.set(ch.cpy().add(direction));
                 setSelected(false);
-                setPosition(
-                        cursor.x - getWidth() / 2,
-                        cursor.y - getHeight() / 2);
+                cursor.sub(getWidth() / 2, getHeight() / 2);
+
+                System.out.println(action);
+                setPosition(cursor.x, cursor.y);
             } else {
                 Projection.draw(stage, this, shapeRenderer);
             }

@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -61,6 +62,15 @@ public class GameScreen implements Screen {
         if (character.isSelected()) {
             character.drawProjection(stage,shapeRenderer);
         }
+
+//        shapeRenderer.begin();
+//        shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
+//        shapeRenderer.set(ShapeRenderer.ShapeType.Line);
+//        shapeRenderer.setColor(Color.WHITE);
+//        shapeRenderer.circle(character.getX() + character.getWidth()/2,
+//                character.getY() + character.getHeight()/2,
+//                250);
+//        shapeRenderer.end();
 
         batch.end();
     }
