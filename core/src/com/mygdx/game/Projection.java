@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-public class Line {
-    private static float lineMaxLength = 250f;
+public class Projection {
+    public static float lineMaxLength = 250f;
     private static float lineThickness = 15f;
     public static void draw(Stage stage, Character theCharacter,ShapeRenderer shapeRenderer){
         Vector2 cursor=stage.getViewport().unproject(new Vector2(Gdx.input.getX(),Gdx.input.getY()));
@@ -15,9 +15,7 @@ public class Line {
                 (theCharacter.getY() + theCharacter.getHeight() / 2));
 
         Vector2 direction = cursor.cpy().sub(character);
-        float length = direction.len();
-
-        if (length > lineMaxLength) {
+        if (direction.len() > lineMaxLength) {
             direction.setLength(lineMaxLength);
             cursor.set(character.cpy().add(direction));
         }
@@ -28,5 +26,13 @@ public class Line {
         shapeRenderer.setColor(Color.WHITE);
         shapeRenderer.rectLine(character,cursor,lineThickness);
         shapeRenderer.end();
+
+        theCharacter.characterProjection.setPosition(
+                cursor.x - theCharacter.getWidth()/2,
+                cursor.y - theCharacter.getHeight()/2);
+        stage.getBatch().begin();
+        theCharacter.characterProjection.draw(stage.getBatch(),0.5f);
+        stage.getBatch().end();
+
     }
 }

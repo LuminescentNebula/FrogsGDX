@@ -1,20 +1,15 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class GameScreen implements Screen {
@@ -23,11 +18,11 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private Image background;
     private Character character;
+    private Image enemy;
 
     public GameScreen() {
-        stage = new Stage(new FitViewport(1024, 512));
-        System.out.println("width "+ Gdx.graphics.getWidth());
-        System.out.println("height "+ Gdx.graphics.getHeight());
+        stage = new Stage(new FitViewport(1024, 512)); //Размер viewport
+        Gdx.graphics.setWindowedMode(1024,512); //Размер окна
         batch = new SpriteBatch();
         shapeRenderer =  new ShapeRenderer();
         shapeRenderer.setAutoShapeType(true);
@@ -37,13 +32,17 @@ public class GameScreen implements Screen {
         // Create images
         background = new Image(new Texture(Gdx.files.internal("background.png")));
         character= new Character();
+        enemy = new Image(new Texture(Gdx.files.internal("ghost.png")));
+        enemy.setSize(100,100);
 
         // Set character position and listeners
         character.setPosition(200, 100);
+        enemy.setPosition(700,100);
 
         // Add actors to stage
         stage.addActor(background);
         stage.addActor(character);
+        stage.addActor(enemy);
     }
 
     @Override
@@ -54,16 +53,15 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        // Update
         stage.getViewport().apply();
         batch.begin();
         stage.draw();
 
-        // Update
-        if (character.isSelected) {
-            Line.draw(stage,character,shapeRenderer);
+        if (character.isSelected()) {
+            character.drawProjection(stage,shapeRenderer);
         }
 
-        // Draw
         batch.end();
     }
 
