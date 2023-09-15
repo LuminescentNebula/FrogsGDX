@@ -27,6 +27,9 @@ public class Character extends Group {
 
     public Vector2 center;
 
+
+    private CharacterSelectionListener selectionListener;
+
     public Character(){
         character = new Image(new Texture(Gdx.files.internal("character.png")));
         selection = new Image(new Texture(Gdx.files.internal("selection.png")));
@@ -46,10 +49,18 @@ public class Character extends Group {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                setSelected(!isSelected);
+                if (!selectionListener.isSelected()) {
+                    setSelected(!isSelected);
+                }
                 return true;
             }
         });
+    }
+
+    public void draw(Stage stage,ShapeRenderer shapeRenderer){
+        if (isSelected()) {
+            drawProjection(stage,shapeRenderer);
+        }
     }
 
     public void drawProjection(Stage stage, ShapeRenderer shapeRenderer){
@@ -109,6 +120,8 @@ public class Character extends Group {
     }
 
     public void setSelected(boolean selected) {
+        selectionListener.setSelected(selected);
+
         timeStamp = TimeUtils.millis();
         pathPoints = new LinkedList<>();
 
@@ -116,11 +129,9 @@ public class Character extends Group {
                 getX() + getWidth() / 2,
                 getY() + getHeight() / 2);
         pathPoints.add(center);
-        currentAction=0;
+        currentAction = 0;
         isSelected = selected;
         selection.setVisible(selected);
-
-
     }
 
     @Override
@@ -132,4 +143,9 @@ public class Character extends Group {
     public float getHeight() {
         return character.getHeight();
     }
+
+    public void setSelectionListener(CharacterSelectionListener selectionListener) {
+        this.selectionListener = selectionListener;
+    }
+
 }

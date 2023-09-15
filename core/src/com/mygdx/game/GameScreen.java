@@ -18,7 +18,7 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private Image background;
-    private Character character;
+    private CharactersPool charactersPool;
     private Image enemy;
 
     public GameScreen() {
@@ -32,17 +32,16 @@ public class GameScreen implements Screen {
 
         // Create images
         background = new Image(new Texture(Gdx.files.internal("background.png")));
-        character= new Character();
+        charactersPool = new CharactersPool();
+
         enemy = new Image(new Texture(Gdx.files.internal("ghost.png")));
         enemy.setSize(100,100);
 
-        // Set character position and listeners
-        character.setPosition(200, 100);
         enemy.setPosition(700,100);
 
         // Add actors to stage
         stage.addActor(background);
-        stage.addActor(character);
+        stage.addActor(charactersPool);
         stage.addActor(enemy);
     }
 
@@ -58,10 +57,7 @@ public class GameScreen implements Screen {
         stage.getViewport().apply();
         batch.begin();
         stage.draw();
-
-        if (character.isSelected()) {
-            character.drawProjection(stage,shapeRenderer);
-        }
+        charactersPool.draw(stage,shapeRenderer);
 
 //        shapeRenderer.begin();
 //        shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
