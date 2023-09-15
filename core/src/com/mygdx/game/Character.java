@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -11,13 +12,20 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.LinkedList;
+
 public class Character extends Group {
     private boolean isSelected;
     Image character,selection,characterProjection;
-    public long startTime;
+    public long timeStamp;
 
     public final int maxAction=1000;
     public int action=0;
+    public int currentAction;
+
+    public LinkedList<Vector2> pathPoints;
+
+    public Vector2 center;
 
     public Character(){
         character = new Image(new Texture(Gdx.files.internal("character.png")));
@@ -45,34 +53,50 @@ public class Character extends Group {
     }
 
     public void drawProjection(Stage stage, ShapeRenderer shapeRenderer){
-        if (Gdx.input.justTouched()) {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-            Vector2 ch = new Vector2(
-                    getX() + getWidth() / 2,
-                    getY() + getHeight() / 2);
-            if (cursor.dst(ch) > 20 && Math.abs(startTime - TimeUtils.millis())>100) {
-                Vector2 direction = cursor.cpy().sub(ch);
-                if (direction.len() > Projection.lineMaxLength) {
-                    direction.setLength(Projection.lineMaxLength);
-                }
-                if (action + direction.len() <= maxAction) {
-                    action += direction.len();
-                } else {
-                    direction.setLength(maxAction - action);
-                    action=maxAction;
-                }
-                cursor.set(ch.cpy().add(direction));
-                setSelected(false);
+
+            //Проверка, что не слишком быстро и не слишком быстро после выделения
+            if (cursor.dst(center) > 20  && cursor.dst(pathPoints.getLast()) > 20 && Math.abs(timeStamp - TimeUtils.millis())>100) {
+                checkDirection(cursor, pathPoints.getLast());
                 cursor.sub(getWidth() / 2, getHeight() / 2);
 
-                System.out.println(action);
-                setPosition(cursor.x, cursor.y);
+                if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                    timeStamp = TimeUtils.millis();
+                    pathPoints.add(cursor.add(getWidth()/2,getHeight()/2));
+                    System.out.println(currentAction);
+                    System.out.println(pathPoints);
+                    Projection.draw(stage, this, shapeRenderer);
+                } else {
+                    action+=currentAction;
+                    System.out.println(action);
+                    setPosition(cursor.x, cursor.y);
+                    setSelected(false);
+                }
             } else {
                 Projection.draw(stage, this, shapeRenderer);
             }
+        } else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+            setSelected(false);
         } else {
             Projection.draw(stage, this, shapeRenderer);
         }
+    }
+
+    //point1 - cursor
+    //point2 - center
+    private void checkDirection(Vector2 point1,Vector2 point2){
+        Vector2 direction = point1.cpy().sub(point2);
+        if (direction.len() > Projection.lineMaxLength) {
+            direction.setLength(Projection.lineMaxLength);
+        }
+        if (action +currentAction+ direction.len() <= maxAction) {
+            currentAction += direction.len();
+        } else {
+            direction.setLength(maxAction - action-currentAction);
+            currentAction=maxAction - action;
+        }
+        point1.set(point2.cpy().add(direction));
     }
 
     public boolean isSelected() {
@@ -80,10 +104,18 @@ public class Character extends Group {
     }
 
     public void setSelected(boolean selected) {
-        startTime = TimeUtils.millis();
+        timeStamp = TimeUtils.millis();
+        pathPoints = new LinkedList<>();
 
+        center = new Vector2(
+                getX() + getWidth() / 2,
+                getY() + getHeight() / 2);
+        pathPoints.add(center);
+        currentAction=0;
         isSelected = selected;
         selection.setVisible(selected);
+
+
     }
 
     @Override

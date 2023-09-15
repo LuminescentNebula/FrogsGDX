@@ -10,29 +10,42 @@ public class Projection {
     public static float lineMaxLength = 250f;
     private static float lineThickness = 15f;
     public static void draw(Stage stage, Character theCharacter,ShapeRenderer shapeRenderer){
-        Vector2 cursor=stage.getViewport().unproject(new Vector2(Gdx.input.getX(),Gdx.input.getY()));
-        Vector2 character = new Vector2((theCharacter.getX() + theCharacter.getWidth() / 2),
-                (theCharacter.getY() + theCharacter.getHeight() / 2));
-
-        Vector2 direction = cursor.cpy().sub(character);
-        if (direction.len() > lineMaxLength) {
-            direction.setLength(lineMaxLength);
-            cursor.set(character.cpy().add(direction));
-        }
 
         shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
         shapeRenderer.begin();
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.WHITE);
-        shapeRenderer.rectLine(character,cursor,lineThickness);
+
+        for (int i=0;i<theCharacter.pathPoints.size()-1;i++){
+            shapeRenderer.rectLine(
+                    theCharacter.pathPoints.get(i),
+                    theCharacter.pathPoints.get(i+1),
+                    lineThickness);
+        }
+
+        Vector2 cursor=stage.getViewport().unproject(new Vector2(Gdx.input.getX(),Gdx.input.getY()));
+
+        Vector2 direction = cursor.cpy().sub(theCharacter.pathPoints.getLast());
+        float restriction=Math.min(lineMaxLength,theCharacter.maxAction-theCharacter.action);
+        if (direction.len() > restriction) {
+            direction.setLength(restriction);
+            cursor.set(theCharacter.pathPoints.getLast().cpy().add(direction));
+        }
+
+        shapeRenderer.rectLine(theCharacter.pathPoints.getLast(),cursor,lineThickness);
+
+
         shapeRenderer.end();
 
+        transparentCharacter(theCharacter,cursor,stage);
+    }
+
+    private static void  transparentCharacter(Character theCharacter,Vector2 cursor,Stage stage){
         theCharacter.characterProjection.setPosition(
                 cursor.x - theCharacter.getWidth()/2,
                 cursor.y - theCharacter.getHeight()/2);
         stage.getBatch().begin();
         theCharacter.characterProjection.draw(stage.getBatch(),0.5f);
         stage.getBatch().end();
-
     }
 }
