@@ -26,7 +26,7 @@ public class Projection {
         Vector2 cursor=stage.getViewport().unproject(new Vector2(Gdx.input.getX(),Gdx.input.getY()));
 
         Vector2 direction = cursor.cpy().sub(theCharacter.pathPoints.getLast());
-        float restriction=Math.min(lineMaxLength,theCharacter.maxAction-theCharacter.action);
+        float restriction=Math.min(lineMaxLength,theCharacter.maxAction-theCharacter.action-theCharacter.currentAction);
         if (direction.len() > restriction) {
             direction.setLength(restriction);
             cursor.set(theCharacter.pathPoints.getLast().cpy().add(direction));

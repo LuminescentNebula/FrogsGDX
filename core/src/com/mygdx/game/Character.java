@@ -78,6 +78,11 @@ public class Character extends Group {
             }
         } else if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
             setSelected(false);
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
+            action+=currentAction;
+            System.out.println(action);
+            setPosition(pathPoints.getLast().x-getWidth()/2,pathPoints.getLast().y-getHeight()/2);
+            setSelected(false);
         } else {
             Projection.draw(stage, this, shapeRenderer);
         }
