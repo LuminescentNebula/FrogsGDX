@@ -119,7 +119,7 @@ public class Projection {
              n+= direction.len();
         } else {
             direction.setLength(character.maxAction - character.action-character.currentAction);
-           n=character.currentAction - (character.maxAction - character.action);
+            n=character.maxAction - character.action-character.currentAction;
         }
         character.currentAction+=n;
         point1.set(point2.cpy().add(direction));
