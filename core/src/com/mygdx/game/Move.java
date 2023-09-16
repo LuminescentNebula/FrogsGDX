@@ -9,4 +9,9 @@ public class Move{
         this.vector=vector;
         this.action=action;
     }
+
+    @Override
+    public String toString() {
+        return vector.toString()+" "+action;
+    }
 }

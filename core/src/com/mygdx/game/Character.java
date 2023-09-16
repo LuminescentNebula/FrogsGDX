@@ -13,27 +13,31 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.LinkedList;
 
-public class Character extends Group{
+public class Character extends Group implements Movable {
 
     private boolean isSelected;
-    Image character,selection,characterProjection;
+    private Image character,selection,characterProjection;
     public long timeStamp;
 
-    public final int maxAction=1000;
-    public int action=0;
-    public int currentAction;
+    private final int maxAction=1000;   //Максимальное действие, которе можно совершить за раунд
+    private int action=0; //Действие, которе было выполнено в текущем раунде
+    private int currentAction; //Действие, которое выполняется в текущем выделении персонажа
 
-    public LinkedList<Move> pathPoints;
-    public Vector2 center;
+    private LinkedList<Move> pathPoints;
+    private Vector2 center;
     private CharacterSelectionListener selectionListener;
 
     public Character(){
-        character = new Image(new Texture(Gdx.files.internal("character.png")));
-        selection = new Image(new Texture(Gdx.files.internal("selection.png")));
+        Texture texture = new Texture(Gdx.files.internal("character.png"));
+        //Сам персонаж
+        character = new Image(texture);
         character.setSize(50,100);
+        //То, что появляется при выделении
+        selection = new Image(new Texture(Gdx.files.internal("selection.png")));
         selection.setSize(50,100);
         selection.setVisible(false);
-        characterProjection = new Image(new Texture(Gdx.files.internal("character.png")));
+        //Проекция при движении
+        characterProjection = new Image(texture);
         characterProjection.setSize(50,100);
         characterProjection.setVisible(false);
 
@@ -64,6 +68,7 @@ public class Character extends Group{
         return isSelected;
     }
 
+    @Override
     public void setSelected(boolean selected) {
         selectionListener.setSelected(selected);
 
@@ -77,6 +82,11 @@ public class Character extends Group{
         currentAction = 0;
         isSelected = selected;
         selection.setVisible(selected);
+    }
+
+    @Override
+    public long getTimestamp() {
+        return timeStamp;
     }
 
     @Override
@@ -94,4 +104,48 @@ public class Character extends Group{
     }
 
 
+    @Override
+    public int getMaxAction() {
+        return maxAction;
+    }
+
+    @Override
+    public int getAction() {
+        return action;
+    }
+
+    @Override
+    public void setAction(int action) {
+        this.action=action;
+    }
+
+    @Override
+    public void addAction(float action) {
+        this.action+=action;
+    }
+
+    @Override
+    public int getCurrentAction() {
+        return currentAction;
+    }
+
+    @Override
+    public LinkedList<Move> getPathPoints() {
+        return pathPoints;
+    }
+
+    @Override
+    public Image getImage() {
+        return character;
+    }
+
+    @Override
+    public Image getSelection() {
+        return selection;
+    }
+
+    @Override
+    public Image getProjection() {
+        return characterProjection;
+    }
 }
