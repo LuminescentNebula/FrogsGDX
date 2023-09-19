@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.interfaces;
 
 public interface CharacterSelectionListener {
     public void setSelected(boolean selected);

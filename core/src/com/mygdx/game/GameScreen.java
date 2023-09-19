@@ -2,15 +2,12 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class GameScreen implements Screen {
@@ -18,8 +15,7 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private Image background;
-    private CharactersPool charactersPool;
-    private Image enemy;
+    private MainPool mainPool;
 
     public GameScreen() {
         stage = new Stage(new FitViewport(1024, 512)); //Размер viewport
@@ -32,17 +28,14 @@ public class GameScreen implements Screen {
 
         // Create images
         background = new Image(new Texture(Gdx.files.internal("background.png")));
-        charactersPool = new CharactersPool();
-
-        enemy = new Image(new Texture(Gdx.files.internal("ghost.png")));
-        enemy.setSize(100,100);
-
-        enemy.setPosition(700,100);
+        background.setName("Background");
 
         // Add actors to stage
         stage.addActor(background);
-        stage.addActor(charactersPool);
-        stage.addActor(enemy);
+
+        mainPool = new MainPool();
+        stage.addActor(mainPool);
+        System.out.println(stage.getActors());
     }
 
     @Override
@@ -56,17 +49,11 @@ public class GameScreen implements Screen {
         // Update
         stage.getViewport().apply();
         batch.begin();
+        //Отрисовка статичных объектов
         stage.draw();
-        charactersPool.draw(stage,shapeRenderer);
+        //Отрисовка перемещения персонажей
+        mainPool.draw(stage,shapeRenderer);
 
-//        shapeRenderer.begin();
-//        shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
-//        shapeRenderer.set(ShapeRenderer.ShapeType.Line);
-//        shapeRenderer.setColor(Color.WHITE);
-//        shapeRenderer.circle(character.getX() + character.getWidth()/2,
-//                character.getY() + character.getHeight()/2,
-//                250);
-//        shapeRenderer.end();
 
         batch.end();
     }

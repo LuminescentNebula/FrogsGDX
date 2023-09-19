@@ -4,9 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.interfaces.Collidable;
+import com.mygdx.game.interfaces.Movable;
 
 public class Projection {
     public static final float lineMaxLength = 250f;
@@ -14,13 +20,7 @@ public class Projection {
     private static final int MIN_DISTANCE = 20;
     private static final int MIN_TIME_DIFFERENCE = 100;
 
-    public static void draw(Stage stage, Movable movable, ShapeRenderer shapeRenderer){
-
-        shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
-        shapeRenderer.begin();
-        shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.WHITE);
-
+    public static void draw(Stage stage, Movable movable, ShapeRenderer shapeRenderer, MainPool mainPool){
         for (int i = 0; i< movable.getPathPoints().size()-1; i++){
             shapeRenderer.rectLine(
                     movable.getPathPoints().get(i).vector,
@@ -41,11 +41,57 @@ public class Projection {
             cursor.set(movable.getPathPoints().getLast().vector.cpy().add(direction));
         }
 
+        Ray ray = new Ray(new Vector3(movable.getPathPoints().get(movable.getPathPoints().size()-1).vector,0),
+                new Vector3(cursor,0));
+        System.out.println("ID: " + movable.getId());
+        for (Collidable other : mainPool) {
+            System.out.println("Other id: " + other.getId());
+            if (other.getId()!=movable.getId()) {
+                BoundingBox boundingBox = new BoundingBox(
+                        new Vector3(other.getBounds().getX(),
+                                other.getBounds().getY(),
+                                0),
+                        new Vector3(other.getBounds().getX() + other.getBounds().getWidth(),
+                                other.getBounds().getY() + other.getBounds().getHeight(), 0));
+                Vector3 intersection = new Vector3();
+
+
+                //Что-то не так с проекциями в Boundig box, ray, intersection
+
+                //shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
+
+                if (Intersector.intersectRayBounds(ray, boundingBox, intersection)) {
+                    shapeRenderer.set(ShapeRenderer.ShapeType.Line);
+                    shapeRenderer.setColor(Color.RED);
+                    System.out.println(ray.origin);
+                    System.out.println(ray.direction);
+                    System.out.println(cursor);
+                    System.out.println(intersection);
+                    shapeRenderer.rectLine(
+                            //movable.getPathPoints().get(movable.getPathPoints().size() - 1).vector,
+                            new Vector2(ray.origin.x, ray.origin.y),
+                            new Vector2(ray.direction.x*400, ray.direction.y*400),
+                            3);
+//                    shapeRenderer.rect(other.getBounds().getX(),
+//                            other.getBounds().getY(),
+//                            other.getBounds().getWidth(),
+//                            other.getBounds().getHeight());
+                    shapeRenderer.rect(
+                            boundingBox.getCorner000(new Vector3()).x,
+                            boundingBox.getCorner000(new Vector3()).y,
+                            boundingBox.getCorner111(new Vector3()).x,
+                            boundingBox.getCorner111(new Vector3()).y);
+                    shapeRenderer.setColor(Color.WHITE);
+
+                    cursor = new Vector2(intersection.x, intersection.y);
+                    shapeRenderer.circle(cursor.x, cursor.y, 5);
+                    break;
+                }
+            }
+        }
+
+
         shapeRenderer.rectLine(movable.getPathPoints().getLast().vector,cursor,lineThickness);
-
-
-        shapeRenderer.end();
-
         transparentProjection(movable,cursor,stage);
     }
 
@@ -58,7 +104,7 @@ public class Projection {
         stage.getBatch().end();
     }
 
-    public static void calculateProjection(Stage stage, ShapeRenderer shapeRenderer, Movable character){
+    public static void calculateProjection(Stage stage, ShapeRenderer shapeRenderer, Movable character, MainPool mainPool){
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
 
@@ -76,7 +122,7 @@ public class Projection {
                             character.getHeight()/2),
                             action));
                     System.out.println(character.getPathPoints());
-                    draw(stage, character, shapeRenderer);
+                    draw(stage, character, shapeRenderer, mainPool);
 
                 } else {
                     character.addAction(character.getCurrentAction());
@@ -85,7 +131,7 @@ public class Projection {
                     character.setSelected(false);
                 }
             } else {
-                draw(stage, character, shapeRenderer);
+                draw(stage, character, shapeRenderer, mainPool);
             }
         } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
             if (character.getPathPoints().size()==1) {
@@ -102,7 +148,7 @@ public class Projection {
                     character.getPathPoints().getLast().vector.y-character.getHeight()/2);
             character.setSelected(false);
         } else {
-            draw(stage, character, shapeRenderer);
+            draw(stage, character, shapeRenderer, mainPool);
         }
     }
 
