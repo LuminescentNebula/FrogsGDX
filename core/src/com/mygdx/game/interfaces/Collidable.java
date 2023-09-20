@@ -11,4 +11,6 @@ public interface Collidable {
     Rectangle getBounds();
 
     int getId();
+    //for debug
+    String getName();
 }

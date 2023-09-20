@@ -35,7 +35,6 @@ public class MainPool extends Group implements Iterable<Collidable> {
     public Iterator<Collidable> iterator() {
         return new Iterator<Collidable>() {
             private int currentIndex = 0;
-            private int size = charactersPool.getSize() + obstaclesPool.getSize() + enemyPool.getSize();
 
             private ArrayList<Collidable> elements = new ArrayList() {{
                 addAll(charactersPool.getActors());
@@ -45,7 +44,7 @@ public class MainPool extends Group implements Iterable<Collidable> {
 
             @Override
             public boolean hasNext() {
-                return currentIndex < size;
+                return currentIndex < elements.size();
             }
 
             @Override

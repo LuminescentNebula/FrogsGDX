@@ -41,55 +41,40 @@ public class Projection {
             cursor.set(movable.getPathPoints().getLast().vector.cpy().add(direction));
         }
 
-        Ray ray = new Ray(new Vector3(movable.getPathPoints().get(movable.getPathPoints().size()-1).vector,0),
-                new Vector3(cursor,0));
-        System.out.println("ID: " + movable.getId());
+        //System.out.println("ID: " + movable.getId());
+
+        shapeRenderer.set(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED);
         for (Collidable other : mainPool) {
-            System.out.println("Other id: " + other.getId());
+            //System.out.println("Other id: " + other.getId()+" "+other.getName());
             if (other.getId()!=movable.getId()) {
-                BoundingBox boundingBox = new BoundingBox(
-                        new Vector3(other.getBounds().getX(),
-                                other.getBounds().getY(),
-                                0),
-                        new Vector3(other.getBounds().getX() + other.getBounds().getWidth(),
-                                other.getBounds().getY() + other.getBounds().getHeight(), 0));
-                Vector3 intersection = new Vector3();
+                Vector2 intersection = new Vector2();
+                AlignmentPack alignmentPack = new AlignmentPack();
+                //Теперь с пересечениями все нормально, но надо определить точку пересечния
+                //Нужно передавать пересечние в следуеющую отрисовку.
+                    shapeRenderer.rect(other.getBounds().getX(),
+                            other.getBounds().getY(),
+                            other.getBounds().getWidth(),
+                            other.getBounds().getHeight());
 
+                if (AdvancedIntersector.intersectSegmentRectangle(
+                        movable.getPathPoints().getLast().vector,
+                        cursor,
+                        other.getBounds(), intersection,alignmentPack)) {
 
-                //Что-то не так с проекциями в Boundig box, ray, intersection
-
-                //shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-
-                if (Intersector.intersectRayBounds(ray, boundingBox, intersection)) {
-                    shapeRenderer.set(ShapeRenderer.ShapeType.Line);
-                    shapeRenderer.setColor(Color.RED);
-                    System.out.println(ray.origin);
-                    System.out.println(ray.direction);
-                    System.out.println(cursor);
-                    System.out.println(intersection);
-                    shapeRenderer.rectLine(
-                            //movable.getPathPoints().get(movable.getPathPoints().size() - 1).vector,
-                            new Vector2(ray.origin.x, ray.origin.y),
-                            new Vector2(ray.direction.x*400, ray.direction.y*400),
+                    shapeRenderer.rectLine(movable.getPathPoints().get(movable.getPathPoints().size()-1).vector,
+                            cursor,
                             3);
-//                    shapeRenderer.rect(other.getBounds().getX(),
-//                            other.getBounds().getY(),
-//                            other.getBounds().getWidth(),
-//                            other.getBounds().getHeight());
-                    shapeRenderer.rect(
-                            boundingBox.getCorner000(new Vector3()).x,
-                            boundingBox.getCorner000(new Vector3()).y,
-                            boundingBox.getCorner111(new Vector3()).x,
-                            boundingBox.getCorner111(new Vector3()).y);
-                    shapeRenderer.setColor(Color.WHITE);
 
-                    cursor = new Vector2(intersection.x, intersection.y);
+                    shapeRenderer.setColor(Color.WHITE);
+                    intersection.x+=(movable.getWidth()/2)*alignmentPack.alignmentSides.get();
+                    intersection.y+=(movable.getHeight()/2)*alignmentPack.alignmentLevel.get();
+                    cursor = intersection;
                     shapeRenderer.circle(cursor.x, cursor.y, 5);
                     break;
                 }
             }
         }
-
 
         shapeRenderer.rectLine(movable.getPathPoints().getLast().vector,cursor,lineThickness);
         transparentProjection(movable,cursor,stage);
@@ -117,9 +102,8 @@ public class Projection {
 
                 if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
                     character.getPathPoints().add(new Move(
-                            cursor.add(
-                            character.getWidth()/2,
-                            character.getHeight()/2),
+                            character.getProjection().getX()+character.getWidth()/2,
+                            character.getProjection().getY()+character.getHeight()/2,
                             action));
                     System.out.println(character.getPathPoints());
                     draw(stage, character, shapeRenderer, mainPool);
@@ -127,12 +111,19 @@ public class Projection {
                 } else {
                     character.addAction(character.getCurrentAction());
                     System.out.println(character.getAction());
-                    character.setPosition(cursor.x, cursor.y);
+                    character.setPosition(character.getProjection().getX(), character.getProjection().getY());
                     character.setSelected(false);
                 }
             } else {
                 draw(stage, character, shapeRenderer, mainPool);
             }
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            character.addAction(character.getCurrentAction());
+            System.out.println(character.getAction());
+            character.setPosition(
+                    character.getPathPoints().getLast().vector.x - character.getWidth() / 2,
+                    character.getPathPoints().getLast().vector.y - character.getHeight() / 2);
+            character.setSelected(false);
         } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
             if (character.getPathPoints().size()==1) {
                 character.setSelected(false);
@@ -140,13 +131,6 @@ public class Projection {
                 character.addAction(-character.getPathPoints().getLast().action);
                 character.getPathPoints().removeLast();
             }
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
-            character.addAction(character.getCurrentAction());
-            System.out.println(character.getAction());
-            character.setPosition(
-                    character.getPathPoints().getLast().vector.x-character.getWidth()/2,
-                    character.getPathPoints().getLast().vector.y-character.getHeight()/2);
-            character.setSelected(false);
         } else {
             draw(stage, character, shapeRenderer, mainPool);
         }

@@ -26,6 +26,16 @@ public class Enemy extends Group implements Collidable {
     }
 
     @Override
+    public float getWidth() {
+        return image.getWidth();
+    }
+
+    @Override
+    public float getHeight() {
+        return image.getHeight();
+    }
+
+    @Override
     public Rectangle getBounds() {
         return bounds;
     }

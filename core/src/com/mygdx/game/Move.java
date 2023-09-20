@@ -9,6 +9,10 @@ public class Move{
         this.vector=vector;
         this.action=action;
     }
+    public Move(float x,float y,float action){
+        this.vector=new Vector2(x,y);
+        this.action=action;
+    }
 
     @Override
     public String toString() {
