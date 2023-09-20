@@ -41,36 +41,20 @@ public class Projection {
             cursor.set(movable.getPathPoints().getLast().vector.cpy().add(direction));
         }
 
-        //System.out.println("ID: " + movable.getId());
-
-        shapeRenderer.set(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.RED);
         for (Collidable other : mainPool) {
-            //System.out.println("Other id: " + other.getId()+" "+other.getName());
             if (other.getId()!=movable.getId()) {
                 Vector2 intersection = new Vector2();
                 AlignmentPack alignmentPack = new AlignmentPack();
-                //Теперь с пересечениями все нормально, но надо определить точку пересечния
-                //Нужно передавать пересечние в следуеющую отрисовку.
-                    shapeRenderer.rect(other.getBounds().getX(),
-                            other.getBounds().getY(),
-                            other.getBounds().getWidth(),
-                            other.getBounds().getHeight());
 
                 if (AdvancedIntersector.intersectSegmentRectangle(
                         movable.getPathPoints().getLast().vector,
                         cursor,
                         other.getBounds(), intersection,alignmentPack)) {
+                    ;
 
-                    shapeRenderer.rectLine(movable.getPathPoints().get(movable.getPathPoints().size()-1).vector,
-                            cursor,
-                            3);
-
-                    shapeRenderer.setColor(Color.WHITE);
-                    intersection.x+=(movable.getWidth()/2)*alignmentPack.alignmentSides.get();
-                    intersection.y+=(movable.getHeight()/2)*alignmentPack.alignmentLevel.get();
+                    intersection.x+=alignmentPack.alignmentSides.get();
+                    intersection.y+=alignmentPack.alignmentLevel.get();
                     cursor = intersection;
-                    shapeRenderer.circle(cursor.x, cursor.y, 5);
                     break;
                 }
             }

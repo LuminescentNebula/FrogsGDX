@@ -9,11 +9,11 @@ public class AlignmentPack {
         EMPTY(0);
 
 
-        double f;
-        Alignment(double f) {
+        int f;
+        Alignment(int f) {
             this.f=f;
         }
-        public double get() {
+        public int get() {
             return f;
         }
     }
@@ -27,6 +27,10 @@ public class AlignmentPack {
     AlignmentPack() {
         this.alignmentSides = Alignment.EMPTY;
         this.alignmentLevel = Alignment.EMPTY;
+    }
+
+    public Alignment[] list(){
+        return new Alignment[]{alignmentLevel,alignmentSides};
     }
 
 

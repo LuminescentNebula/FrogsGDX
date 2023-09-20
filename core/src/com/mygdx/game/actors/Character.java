@@ -166,6 +166,7 @@ public class Character extends Group implements Movable {
     @Override
     public void setPosition(float x, float y) {
         bounds.set(x, y, characterProjection.getWidth(), characterProjection.getHeight());
+        toFront();
         super.setPosition(x, y);
     }
 
