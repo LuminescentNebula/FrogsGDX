@@ -14,20 +14,23 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.MainPool;
 import com.mygdx.game.Move;
 import com.mygdx.game.Projection;
+import com.mygdx.game.interfaces.Actionable;
 import com.mygdx.game.interfaces.CharacterSelectionListener;
-import com.mygdx.game.interfaces.Movable;
 
 import java.util.LinkedList;
 
-public class Character extends Group implements Movable {
+public class Character extends Group implements Actionable {
 
     private boolean isSelected=false;
     private Image character,selection,characterProjection;
     public long timeStamp;
 
-    private final int maxAction=1000;   //Максимальное действие, которе можно совершить за раунд
-    private int action=0; //Действие, которе было выполнено в текущем раунде
-    private int currentAction; //Действие, которое выполняется в текущем выделении персонажа
+    protected final int maxAction=1000;   //Максимальное действие, которе можно совершить за раунд
+    protected int action=0;               //Действие, которе было выполнено в текущем раунде
+    protected int currentAction;          //Действие, которое выполняется в текущем выделении персонажа
+
+    private int health;
+    private int maxHealth=100;
 
     private LinkedList<Move> pathPoints;
     private Vector2 center;
@@ -38,25 +41,31 @@ public class Character extends Group implements Movable {
 
     public Character(int ID){
         Texture texture = new Texture(Gdx.files.internal("character.png"));
+        this.ID=ID;
         //Сам персонаж
         character = new Image(texture);
         character.setSize(50,100);
         character.setName("Character");
+
         //То, что появляется при выделении
         selection = new Image(new Texture(Gdx.files.internal("selection.png")));
         selection.setSize(50,100);
         selection.setVisible(false);
         selection.setName("Selection");
+
         //Проекция при движении
         characterProjection = new Image(texture);
         characterProjection.setSize(50,100);
         characterProjection.setVisible(false);
         characterProjection.setName("Projection");
+
         //Добавление на сцену
         addActor(character);
         addActor(selection);
         addActor(characterProjection);
-        this.ID=ID;
+
+        health=100;
+
         //Слушатель для выделения персонажа
         addListener(new InputListener() {
             @Override
@@ -116,7 +125,6 @@ public class Character extends Group implements Movable {
     public void setSelectionListener(CharacterSelectionListener selectionListener) {
         this.selectionListener = selectionListener;
     }
-
 
     @Override
     public int getMaxAction() {
@@ -178,5 +186,25 @@ public class Character extends Group implements Movable {
     @Override
     public int getId() {
         return ID;
+    }
+
+    @Override
+    public void setHealth(int health) {
+        this.health=health;
+    }
+
+    @Override
+    public void dealHealth(int health) {
+        this.health-=health;
+    }
+
+    @Override
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    @Override
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth=maxHealth;
     }
 }

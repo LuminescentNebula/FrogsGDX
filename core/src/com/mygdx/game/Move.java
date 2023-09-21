@@ -4,9 +4,9 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Move{
     Vector2 vector;
-    float action;
+    final float action;
     public Move(Vector2 vector,float action){
-        this.vector=vector;
+        this.vector=new Vector2(vector);
         this.action=action;
     }
     public Move(float x,float y,float action){
@@ -16,6 +16,6 @@ public class Move{
 
     @Override
     public String toString() {
-        return vector.toString()+" "+action;
+        return "Move{vector=" + vector + ", action=" + action + "}";
     }
 }

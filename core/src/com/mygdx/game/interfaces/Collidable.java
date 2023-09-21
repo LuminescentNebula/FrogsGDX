@@ -10,6 +10,10 @@ import java.util.LinkedList;
 public interface Collidable {
     Rectangle getBounds();
 
+    float getWidth();
+    float getHeight();
+    void setPosition(float x, float y);
+
     int getId();
     //for debug
     String getName();

@@ -1,12 +1,9 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.AlignmentPack.Alignment;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 public class AdvancedIntersector  {
 
@@ -43,13 +40,6 @@ public class AdvancedIntersector  {
         }
     }
 
-    /** Determines whether the given rectangle and segment intersect
-     * @param startX x-coordinate start of line segment
-     * @param startY y-coordinate start of line segment
-     * @param endX y-coordinate end of line segment
-     * @param endY y-coordinate end of line segment
-     * @param rectangle rectangle that is being tested for collision
-     * @return whether the rectangle intersects with the line segment */
     public static boolean intersectSegmentRectangle (float startX, float startY, float endX, float endY, Rectangle rectangle, Vector2 intersection,AlignmentPack alignment) {
         float rectangleEndX = rectangle.x + rectangle.width;
         float rectangleEndY = rectangle.y + rectangle.height;
@@ -59,25 +49,25 @@ public class AdvancedIntersector  {
             switch (i) {
                 case LEFT:
                     if (intersectSegments(startX, startY, endX, endY, rectangle.x, rectangle.y, rectangle.x, rectangleEndY, intersection)) {
-                        System.out.println("Left " + intersection);
+                        //System.out.println("Left " + intersection);
                         return true;
                     }
                     break;
                 case BOTTOM:
                     if (intersectSegments(startX, startY, endX, endY, rectangle.x, rectangle.y, rectangleEndX, rectangle.y, intersection)) {
-                        System.out.println("Bottom " + intersection);
+                        //System.out.println("Bottom " + intersection);
                         return true;
                     }
                     break;
                 case RIGHT:
                     if (intersectSegments(startX, startY, endX, endY, rectangleEndX, rectangle.y, rectangleEndX, rectangleEndY, intersection)) {
-                        System.out.println("Right " + intersection);
+                        //System.out.println("Right " + intersection);
                         return true;
                     }
                     break;
                 case TOP:
                     if (intersectSegments(startX, startY, endX, endY, rectangle.x, rectangleEndY, rectangleEndX, rectangleEndY, intersection)) {
-                        System.out.println("Top " + intersection);
+                        //System.out.println("Top " + intersection);
                         return true;
                     }
                     break;

@@ -2,17 +2,12 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.interfaces.Actionable;
 import com.mygdx.game.interfaces.Collidable;
-import com.mygdx.game.interfaces.Movable;
 
 public class Projection {
     public static final float lineMaxLength = 250f;
@@ -20,7 +15,7 @@ public class Projection {
     private static final int MIN_DISTANCE = 20;
     private static final int MIN_TIME_DIFFERENCE = 100;
 
-    public static void draw(Stage stage, Movable movable, ShapeRenderer shapeRenderer, MainPool mainPool){
+    public static void draw(Stage stage, Actionable movable, ShapeRenderer shapeRenderer, MainPool mainPool){
         for (int i = 0; i< movable.getPathPoints().size()-1; i++){
             shapeRenderer.rectLine(
                     movable.getPathPoints().get(i).vector,
@@ -64,7 +59,7 @@ public class Projection {
         transparentProjection(movable,cursor,stage);
     }
 
-    private static void  transparentProjection(Movable movable, Vector2 cursor, Stage stage){
+    private static void  transparentProjection(Actionable movable, Vector2 cursor, Stage stage){
         movable.getProjection().setPosition(
                 cursor.x - movable.getWidth()/2,
                 cursor.y - movable.getHeight()/2);
@@ -73,7 +68,7 @@ public class Projection {
         stage.getBatch().end();
     }
 
-    public static void calculateProjection(Stage stage, ShapeRenderer shapeRenderer, Movable character, MainPool mainPool){
+    public static void calculateProjection(Stage stage, ShapeRenderer shapeRenderer, Actionable character, MainPool mainPool){
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
 
@@ -81,7 +76,9 @@ public class Projection {
             if (cursor.dst(character.getPathPoints().getFirst().vector) > MIN_DISTANCE  &&
                     cursor.dst(character.getPathPoints().getLast().vector) > MIN_DISTANCE &&
                     Math.abs(character.getTimestamp() - TimeUtils.millis())>MIN_TIME_DIFFERENCE) {
-                int action=checkDirection(cursor, character.getPathPoints().getLast().vector,character);
+                int action=checkDirection(new Vector2(character.getProjection().getX()+character.getWidth()/2,
+                        character.getProjection().getY()+character.getHeight()/2),
+                        character.getPathPoints().getLast().vector,character);
                 cursor.sub(character.getWidth() / 2, character.getHeight() / 2);
 
                 if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
@@ -122,7 +119,7 @@ public class Projection {
 
     //point1 - cursor
     //point2 - center
-    private static int checkDirection(Vector2 point1, Vector2 point2, Movable character){
+    private static int checkDirection(Vector2 point1, Vector2 point2, Actionable character){
         Vector2 direction = point1.cpy().sub(point2);
         if (direction.len() > Projection.lineMaxLength) {
             direction.setLength(Projection.lineMaxLength);
