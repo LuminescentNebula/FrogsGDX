@@ -9,26 +9,28 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.game.MainPool;
 import com.mygdx.game.interfaces.Actionable;
+import com.mygdx.game.interfaces.Attackable;
 import com.mygdx.game.interfaces.Collidable;
+import com.mygdx.game.interfaces.Health;
 
 import java.util.ArrayList;
 
-public abstract class Action {
+public abstract class Attack {
     //flags
     boolean stopOnFirstCollision=true;
     boolean isSelected=false;
-    Actionable master;
+    Attackable master;
     int damage=10;
     int area=0;
-    ArrayList<Actionable> targets = new ArrayList<>();
+    ArrayList<Health> targets = new ArrayList<>();
 
-    public Action(Actionable master){
+    public Attack(Attackable master){
         this.master = master;
     }
 
     public void act() {
-        for (Actionable target : targets) {
-            target.dealHealth(damage);
+        for (Health target : targets) {
+            //target.dealHealth(damage);
         }
     }
 

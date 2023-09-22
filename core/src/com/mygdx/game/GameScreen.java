@@ -51,9 +51,8 @@ public class GameScreen implements Screen {
         batch.begin();
         //Отрисовка статичных объектов
         stage.draw();
-        //Отрисовка перемещения персонажей
-        mainPool.draw(stage,shapeRenderer);
-
+        //Отрисовка действий и перемещения персонажей
+        mainPool.act(stage,shapeRenderer);
 
         batch.end();
     }

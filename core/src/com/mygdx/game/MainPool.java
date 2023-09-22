@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -25,10 +26,18 @@ public class MainPool extends Group implements Iterable<Collidable> {
         addActor(enemyPool);
     }
 
-    void draw(Stage stage, ShapeRenderer shapeRenderer) {
-        charactersPool.draw(stage, shapeRenderer,this);
-        //obstaclesPool.draw(stage,shapeRenderer);
+    void act(Stage stage, ShapeRenderer shapeRenderer) {
+        shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
+        shapeRenderer.begin();
+        shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.WHITE);
+
+        charactersPool.project(stage, shapeRenderer,this);
+        charactersPool.act(stage,shapeRenderer,this);
+
+        shapeRenderer.end();
     }
+
 
 
     @Override

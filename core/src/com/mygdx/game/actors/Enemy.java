@@ -3,6 +3,7 @@ package com.mygdx.game.actors;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -33,6 +34,20 @@ public class Enemy extends Group implements Collidable {
     @Override
     public float getHeight() {
         return image.getHeight();
+    }
+
+    @Override
+    public float getCenterX(){
+        return getX()+getWidth()/2;
+    }
+    @Override
+    public float getCenterY(){
+        return getY()+getHeight()/2;
+    }
+
+    @Override
+    public Vector2 getCenter(){
+        return new Vector2(getCenterX(), getCenterY());
     }
 
     @Override

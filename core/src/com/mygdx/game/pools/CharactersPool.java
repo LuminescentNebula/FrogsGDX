@@ -1,6 +1,5 @@
 package com.mygdx.game.pools;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.game.actors.Character;
@@ -23,19 +22,17 @@ public class CharactersPool extends Pool<Character> implements CharacterSelectio
         addActor(character2);
     }
 
-    public void draw(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
-        shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
-        shapeRenderer.begin();
-        shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.WHITE);
-
+    public void project(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
         for (Character character: actors) {
-            character.draw(stage,shapeRenderer, mainPool);
+            character.move(stage,shapeRenderer, mainPool);
         }
-
-        shapeRenderer.end();
     }
 
+    public void act(Stage stage, ShapeRenderer shapeRenderer,MainPool mainPool) {
+        for (Character character: actors) {
+            character.act(stage,shapeRenderer,mainPool);
+        }
+    }
 
     @Override
     public void setSelected(boolean selected) {

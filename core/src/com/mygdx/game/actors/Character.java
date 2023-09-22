@@ -14,12 +14,14 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.MainPool;
 import com.mygdx.game.Move;
 import com.mygdx.game.Projection;
-import com.mygdx.game.interfaces.Actionable;
-import com.mygdx.game.interfaces.CharacterSelectionListener;
+import com.mygdx.game.actions.Attack;
+import com.mygdx.game.actions.Catapult;
+import com.mygdx.game.interfaces.*;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Character extends Group implements Actionable {
+public class Character extends Group implements Movable, Attackable, Health {
 
     private boolean isSelected=false;
     private Image character,selection,characterProjection;
@@ -29,11 +31,12 @@ public class Character extends Group implements Actionable {
     protected int action=0;               //Действие, которе было выполнено в текущем раунде
     protected int currentAction;          //Действие, которое выполняется в текущем выделении персонажа
 
+    ArrayList<Attack> attacks =  new ArrayList<>();
+
     private int health;
     private int maxHealth=100;
 
     private LinkedList<Move> pathPoints;
-    private Vector2 center;
     private CharacterSelectionListener selectionListener;
 
     private Rectangle bounds = new Rectangle();
@@ -66,6 +69,8 @@ public class Character extends Group implements Actionable {
 
         health=100;
 
+        attacks.add(new Catapult(this));
+
         //Слушатель для выделения персонажа
         addListener(new InputListener() {
             @Override
@@ -78,7 +83,7 @@ public class Character extends Group implements Actionable {
         });
     }
 
-    public void draw(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool){
+    public void move(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool){
         if (isSelected()) {
             Projection.calculateProjection(stage,shapeRenderer,this, mainPool);
         }
@@ -87,8 +92,29 @@ public class Character extends Group implements Actionable {
 //        }
     }
 
+    public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool){
+        shapeRenderer.set(ShapeRenderer.ShapeType.Point);
+        if (isSelected() && action==maxAction) {
+            attacks.get(0).draw(0,0,stage,shapeRenderer,mainPool);
+        }
+    }
+
     public boolean isSelected() {
         return isSelected;
+    }
+
+    @Override
+    public float getCenterX(){
+        return getX()+getWidth()/2;
+    }
+    @Override
+    public float getCenterY(){
+        return getY()+getHeight()/2;
+    }
+
+    @Override
+    public Vector2 getCenter(){
+        return new Vector2(getCenterX(), getCenterY());
     }
 
     @Override
@@ -98,10 +124,9 @@ public class Character extends Group implements Actionable {
         timeStamp = TimeUtils.millis();
         pathPoints = new LinkedList<>();
 
-        center = new Vector2(
+        pathPoints.add(new Move(new Vector2(
                 getX() + getWidth() / 2,
-                getY() + getHeight() / 2);
-        pathPoints.add(new Move(center,0));
+                getY() + getHeight() / 2),0));
         currentAction = 0;
         isSelected = selected;
         selection.setVisible(selected);
@@ -194,6 +219,11 @@ public class Character extends Group implements Actionable {
     }
 
     @Override
+    public int getHealth() {
+        return health;
+    }
+
+    @Override
     public void dealHealth(int health) {
         this.health-=health;
     }
@@ -207,4 +237,9 @@ public class Character extends Group implements Actionable {
     public void setMaxHealth(int maxHealth) {
         this.maxHealth=maxHealth;
     }
+
+    @Override
+    public ArrayList<Attack> getAttacks(){
+        return attacks;
+    };
 }
