@@ -1,6 +1,8 @@
 package com.mygdx.game.actors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -18,6 +20,7 @@ import com.mygdx.game.actions.Attack;
 import com.mygdx.game.actions.Catapult;
 import com.mygdx.game.interfaces.*;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -40,7 +43,7 @@ public class Character extends Group implements Movable, Attackable, Health {
     private CharacterSelectionListener selectionListener;
 
     private Rectangle bounds = new Rectangle();
-    private int ID;
+    private final int ID;
 
     public Character(int ID){
         Texture texture = new Texture(Gdx.files.internal("character.png"));
@@ -92,10 +95,13 @@ public class Character extends Group implements Movable, Attackable, Health {
 //        }
     }
 
-    public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool){
-        shapeRenderer.set(ShapeRenderer.ShapeType.Point);
-        if (isSelected() && action==maxAction) {
-            attacks.get(0).draw(0,0,stage,shapeRenderer,mainPool);
+    public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
+        //shapeRenderer.set(ShapeRenderer.ShapeType.Point);
+        if (isSelected()) {
+            attacks.get(0).draw(stage, shapeRenderer);
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                attacks.get(0).act(stage, shapeRenderer, mainPool);
+            }
         }
     }
 
@@ -241,5 +247,5 @@ public class Character extends Group implements Movable, Attackable, Health {
     @Override
     public ArrayList<Attack> getAttacks(){
         return attacks;
-    };
+    }
 }

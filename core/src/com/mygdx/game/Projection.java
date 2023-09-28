@@ -17,7 +17,7 @@ public class Projection {
 
 
     private static boolean calculateIntersection(Movable movable, MainPool mainPool, Vector2 cursor){
-        for (Collidable other : mainPool) {
+        for (Collidable other : mainPool.getCollidables()) {
             if (other.getId()!=movable.getId()) {
                 Vector2 intersection = new Vector2();
                 AlignmentPack alignmentPack = new AlignmentPack();
@@ -123,11 +123,9 @@ public class Projection {
 
     //point1 - cursor
     //point2 - center
-    private static int checkDirection(Vector2 point1, Vector2 point2, Movable character){
-        Vector2 direction = point1.cpy().sub(point2);
-        if (direction.len() > Projection.MAX_LINE_LENGTH) {
-            direction.setLength(Projection.MAX_LINE_LENGTH);
-        }
+    private static int checkDirection(Vector2 cursor, Vector2 center, Movable character){
+        Vector2 direction = cursor.cpy().sub(center);
+        direction.limit(Projection.MAX_LINE_LENGTH);
         int n=0;
         if (character.getAction() +character.getCurrentAction()+ direction.len() <= character.getMaxAction()) {
              n+= direction.len();
@@ -136,8 +134,7 @@ public class Projection {
             n=character.getMaxAction() - character.getAction() +-character.getCurrentAction();
         }
         character.addAction(n);
-        point1.set(point2.cpy().add(direction));
+        cursor.set(center.cpy().add(direction));
         return n;
     }
-
 }

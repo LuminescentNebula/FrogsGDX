@@ -1,6 +1,6 @@
 package com.mygdx.game.interfaces;
 
-public interface Health {
+public interface Health extends Collidable{
     //ArrayList<Action> getActions();
     void setHealth(int health);
     int getHealth();
