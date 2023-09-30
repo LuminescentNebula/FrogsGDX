@@ -2,7 +2,6 @@ package com.mygdx.game.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -17,10 +16,15 @@ import com.mygdx.game.MainPool;
 import com.mygdx.game.Move;
 import com.mygdx.game.Projection;
 import com.mygdx.game.actions.Attack;
-import com.mygdx.game.actions.Catapult;
+import com.mygdx.game.actions.Fabric;
+import com.mygdx.game.actions.Flag;
+import com.mygdx.game.actions.Radius;
+import com.mygdx.game.actions.types.Catapult;
+import com.mygdx.game.actions.types.Cone;
+import com.mygdx.game.actions.types.Shot;
+import com.mygdx.game.actions.types.Target;
 import com.mygdx.game.interfaces.*;
 
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -34,10 +38,11 @@ public class Character extends Group implements Movable, Attackable, Health {
     protected int action=0;               //Действие, которе было выполнено в текущем раунде
     protected int currentAction;          //Действие, которое выполняется в текущем выделении персонажа
 
-    ArrayList<Attack> attacks =  new ArrayList<>();
+    ArrayList<Attack> attacks = new ArrayList<>();
 
     private int health;
     private int maxHealth=100;
+    private boolean targeted;
 
     private LinkedList<Move> pathPoints;
     private CharacterSelectionListener selectionListener;
@@ -54,6 +59,7 @@ public class Character extends Group implements Movable, Attackable, Health {
         character.setName("Character");
 
         //То, что появляется при выделении
+        //TODO: Зеленым при выделении и Красным при атаке
         selection = new Image(new Texture(Gdx.files.internal("selection.png")));
         selection.setSize(50,100);
         selection.setVisible(false);
@@ -72,7 +78,11 @@ public class Character extends Group implements Movable, Attackable, Health {
 
         health=100;
 
-        attacks.add(new Catapult(this));
+        Fabric fabric = new Fabric(
+                (byte)(Flag.checkNotMaster|Flag.stopOnFirstCollision),
+                new Cone(),
+                0,350, Radius.NONE, 10);
+        attacks.add(fabric.build(this));
 
         //Слушатель для выделения персонажа
         addListener(new InputListener() {
@@ -96,11 +106,13 @@ public class Character extends Group implements Movable, Attackable, Health {
     }
 
     public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
-        //shapeRenderer.set(ShapeRenderer.ShapeType.Point);
+        Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+
         if (isSelected()) {
-            attacks.get(0).draw(stage, shapeRenderer);
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                attacks.get(0).act(stage, shapeRenderer, mainPool);
+            attacks.get(0).draw(shapeRenderer,getCenter(),cursor);
+                attacks.get(0).act(mainPool,shapeRenderer,this,cursor);
+            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                //attacks.get(0).deal();
             }
         }
     }
@@ -242,6 +254,12 @@ public class Character extends Group implements Movable, Attackable, Health {
     @Override
     public void setMaxHealth(int maxHealth) {
         this.maxHealth=maxHealth;
+    }
+
+    @Override
+    public void setTargeted(boolean targeted) {
+        this.targeted=targeted;
+
     }
 
     @Override

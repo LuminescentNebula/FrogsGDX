@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.actions;
 
 public class Radius{
     public static float NONE = 0.1f;

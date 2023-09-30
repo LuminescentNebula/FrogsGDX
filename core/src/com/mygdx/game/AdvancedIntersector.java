@@ -9,7 +9,7 @@ public class AdvancedIntersector  {
 
     public AdvancedIntersector(){}
 
-
+    //TODO javadoc
     private static void calculateAlignment(float startX, float startY, float endX, float endY, Rectangle rectangle, AlignmentPack alignment) {
         float rectangleEndX = rectangle.x + rectangle.width;
         float rectangleEndY = rectangle.y + rectangle.height;
@@ -45,6 +45,7 @@ public class AdvancedIntersector  {
         float rectangleEndY = rectangle.y + rectangle.height;
         calculateAlignment(startX, startY, endX, endY, rectangle, alignment);
 
+        System.out.println(alignment.list()[0].get()+" "+alignment.list()[1].get());
         for (Alignment i: alignment.list()) {
             switch (i) {
                 case LEFT:
@@ -99,4 +100,6 @@ public class AdvancedIntersector  {
         if (intersection != null) intersection.set(x1 + (x2 - x1) * ua, y1 + (y2 - y1) * ua);
         return true;
     }
+
 }
+

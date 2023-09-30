@@ -7,6 +7,9 @@ public interface Health extends Collidable{
     void dealHealth(int health);
     int getMaxHealth();
     void setMaxHealth(int maxHealth);
+    //TODO: устанавливает, что цель выбрана,затем нужно на ней отрисовать
+    void setTargeted(boolean targeted);
+    //TODO: эффекты
 //    boolean isDead();
 //    void die();
 }

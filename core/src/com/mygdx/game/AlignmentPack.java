@@ -32,7 +32,4 @@ public class AlignmentPack {
     public Alignment[] list(){
         return new Alignment[]{alignmentLevel,alignmentSides};
     }
-
-
-
 }

@@ -19,7 +19,8 @@ public interface Collidable {
     void setPosition(float x, float y);
 
 
+
     int getId();
-    //for debug
+    //FIXME:for debug
     String getName();
 }

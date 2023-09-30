@@ -12,7 +12,7 @@ public class CharactersPool extends Pool<Character> implements CharacterSelectio
 
     public CharactersPool(){
         Character character1= new Character(actors.size()+ID_GROUP);
-        character1.setPosition(200, 100);
+        character1.setPosition(200, 200);
         character1.setSelectionListener(this);
         addActor(character1);
 
