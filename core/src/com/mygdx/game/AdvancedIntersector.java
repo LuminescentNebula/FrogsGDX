@@ -83,6 +83,23 @@ public class AdvancedIntersector  {
         return intersectSegmentRectangle(start.x, start.y, end.x, end.y, rectangle,intersection,alignment);
     }
 
+    public static boolean intersectSegmentRectangle (float startX, float startY, float endX, float endY, Rectangle rectangle,Vector2 intersection) {
+        float rectangleEndX = rectangle.x + rectangle.width;
+        float rectangleEndY = rectangle.y + rectangle.height;
+
+        if (intersectSegments(startX, startY, endX, endY, rectangle.x, rectangle.y, rectangle.x, rectangleEndY, intersection))
+            return true;
+        if (intersectSegments(startX, startY, endX, endY, rectangle.x, rectangle.y, rectangleEndX, rectangle.y, intersection))
+            return true;
+        if (intersectSegments(startX, startY, endX, endY, rectangleEndX, rectangle.y, rectangleEndX, rectangleEndY, intersection))
+            return true;
+        if (intersectSegments(startX, startY, endX, endY, rectangle.x, rectangleEndY, rectangleEndX, rectangleEndY, intersection))
+            return true;
+
+        return false;
+    }
+
+
 
     private static boolean intersectSegments (float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
                                              Vector2 intersection) {
