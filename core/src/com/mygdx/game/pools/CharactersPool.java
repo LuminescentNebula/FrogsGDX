@@ -17,9 +17,14 @@ public class CharactersPool extends Pool<Character> implements CharacterSelectio
         addActor(character1);
 
         Character character2= new Character(actors.size()+ID_GROUP);
-        character2.setPosition(400, 100);
+        character2.setPosition(400, 200);
         character2.setSelectionListener(this);
         addActor(character2);
+
+        Character character3= new Character(actors.size()+ID_GROUP);
+        character3.setPosition(500, 200);
+        character3.setSelectionListener(this);
+        addActor(character3);
     }
 
     public void project(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {

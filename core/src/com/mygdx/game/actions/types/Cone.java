@@ -6,7 +6,7 @@ import com.mygdx.game.AdvancedIntersector;
 import com.mygdx.game.actions.ActDrawInterface;
 import com.mygdx.game.interfaces.Health;
 
-public class Cone extends BaseType {//Снаряд
+public class Cone extends BaseType {//Конус
 
     float radius,angle;
     protected final static float coneArcSize = 53;
@@ -34,7 +34,6 @@ public class Cone extends BaseType {//Снаряд
                 new Vector2(other.getBounds().x,other.getBounds().y+other.getBounds().height)}) {
             if (circle.contains(i) && tri.contains(i)) {
                 shapeRenderer.rect(other.getBounds().getX(), other.getBounds().getY(), other.getBounds().getWidth(), other.getBounds().getHeight());
-                targetsSelectionListener.addTarget(other);
                 return true;
             }
         }

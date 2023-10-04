@@ -79,9 +79,9 @@ public class Character extends Group implements Movable, Attackable, Health {
         health=100;
 
         Fabric fabric = new Fabric(
-                (byte)(Flag.checkNotMaster|Flag.stopOnFirstCollision),
-                new Cone(),
-                0,350, Radius.NONE, 10);
+                (byte)(Flag.checkNotMaster|Flag.stopOnFirstCollision|Flag.chainDamage),
+                new Catapult(),
+                0,350, Radius.LARGE, 10);
         attacks.add(fabric.build(this));
 
         //Слушатель для выделения персонажа

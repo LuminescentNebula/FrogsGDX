@@ -14,9 +14,7 @@ import com.mygdx.game.actions.types.BaseType;
 import com.mygdx.game.interfaces.Attackable;
 import com.mygdx.game.interfaces.Health;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -59,25 +57,47 @@ public class Attack implements TargetsSelectionListener {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         Gdx.gl.glEnable(GL30.GL_BLEND);
         Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.setColor(new Color(areaColor));
 
         type.draw(shapeRenderer,master,cursor, minLength, maxLength,radius);
+        targets = new HashSet<>();
     }
 
     public void act(MainPool mainPool, ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor) {
+
+        shapeRenderer.setColor(new Color(areaColor));
+
+        shapeRenderer.set(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(new Color(Color.BLACK));
+        shapeRenderer.circle(cursor.x, cursor.y, radius);
+        shapeRenderer.setColor(new Color(areaColor));
+        shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
+
         Stream<Health> stream = mainPool.getHealths().stream();
         if (flags.is(Flag.checkNotMaster)) {
-            stream = stream.filter(other -> master.getId() != other.getId());
+            stream = (stream.filter(other -> master.getId() != other.getId()));
         }
-        stream.filter(other -> type.check(other, shapeRenderer, master.getCenter(), cursor,
-                        new Circle(cursor, radius)) && flags.is(Flag.chainDamage))
-                .forEach(other -> act(mainPool, shapeRenderer, master, other.getCenter()));
-    }
-
-    @Override
-    public void addTarget(Health target) {
-        if (targets.contains(target)) {
-            this.targets.add(target);
+        if (flags.is(Flag.chainChecking)) {
+            stream = stream.filter(other -> type.chainCheck(other, shapeRenderer,
+                    new Circle(cursor, radius)));
+        } else {
+            stream = stream.filter(other -> type.check(other, shapeRenderer, master.getCenter(), cursor,
+                    new Circle(cursor, radius)));
+        }
+        if (flags.is(Flag.stopOnFirstCollision)) {
+            flags.del(Flag.stopOnFirstCollision);
+            flags.add(Flag.chainChecking);
+            stream.findFirst().ifPresent(other -> {
+                if (targets.add(other) && flags.is(Flag.chainDamage)) act(mainPool, shapeRenderer, master, other.getCenter());
+            });
+            flags.del(Flag.chainChecking);
+            flags.add(Flag.stopOnFirstCollision);
+        } else {
+            stream.forEach(other -> {
+                if (targets.add(other) && flags.is(Flag.chainDamage)) {
+                    System.out.println("ID "+other.getId());
+                    act(mainPool, shapeRenderer, master, other.getCenter());
+                };
+            });
         }
     }
 
