@@ -11,11 +11,7 @@ public class Shot extends BaseType {//Снаряд
 
     @Override
     public boolean check(Health other, ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, Circle circle) {
-        if (Intersector.intersectSegmentRectangle(master, cursor, other.getBounds())) {
-                shapeRenderer.circle(other.getCenterX(), other.getCenterY(), 100);
-                return true;
-            }
-        return false;
+        return Intersector.intersectSegmentRectangle(master, cursor, other.getBounds());
     }
 
     @Override

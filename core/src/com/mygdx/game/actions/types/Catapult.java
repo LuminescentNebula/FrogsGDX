@@ -4,17 +4,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.AdvancedIntersector;
 import com.mygdx.game.interfaces.Health;
 
 public class Catapult extends BaseType {//Снаряд
 
     @Override
     public boolean check(Health other, ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, Circle circle) {
-        if (Intersector.overlaps(circle, other.getBounds())) {
-            shapeRenderer.circle(other.getCenterX(), other.getCenterY(), 50);
-            return true;
-        }
-        return false;
+        return Intersector.overlaps(circle, other.getBounds());
     }
 
     @Override        //Не рисуется точками

@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 //        CHAIN -- режим
 //        RANGE
 
-public class Attack implements TargetsSelectionListener {
+public class Attack {
     private boolean isSelected=false;
     private Attackable master;
     private BaseType type;
@@ -36,7 +36,7 @@ public class Attack implements TargetsSelectionListener {
     private float radius; //chainradius=radius
     private float minLength;
     private float maxLength;
-    private int damage=10;
+    private int damage = 10;
     private Set<Health> targets = new HashSet<>();
 
     private static final Color areaColor=new Color(1,1,0,0.3f);
@@ -44,7 +44,6 @@ public class Attack implements TargetsSelectionListener {
     public Attack(Attackable master, BaseType type){
         this.master = master;
         this.type = type;
-        this.type.setTargetsSelectionListener(this);
     }
 
     private void deal(){
@@ -59,6 +58,13 @@ public class Attack implements TargetsSelectionListener {
         Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 
         type.draw(shapeRenderer,master,cursor, minLength, maxLength,radius);
+        flushTargets();
+    }
+
+    private void flushTargets() {
+        for (Health health:targets) {
+            health.setTargeted(false);
+        }
         targets = new HashSet<>();
     }
 
@@ -67,9 +73,7 @@ public class Attack implements TargetsSelectionListener {
         shapeRenderer.setColor(new Color(areaColor));
 
         shapeRenderer.set(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(new Color(Color.BLACK));
         shapeRenderer.circle(cursor.x, cursor.y, radius);
-        shapeRenderer.setColor(new Color(areaColor));
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
 
         Stream<Health> stream = mainPool.getHealths().stream();
@@ -87,29 +91,23 @@ public class Attack implements TargetsSelectionListener {
             flags.del(Flag.stopOnFirstCollision);
             flags.add(Flag.chainChecking);
             stream.findFirst().ifPresent(other -> {
-                if (targets.add(other) && flags.is(Flag.chainDamage)) act(mainPool, shapeRenderer, master, other.getCenter());
+                if (isAdd(other) && flags.is(Flag.chainDamage)) act(mainPool, shapeRenderer, master, other.getCenter());
             });
             flags.del(Flag.chainChecking);
             flags.add(Flag.stopOnFirstCollision);
         } else {
             stream.forEach(other -> {
-                if (targets.add(other) && flags.is(Flag.chainDamage)) {
-                    System.out.println("ID "+other.getId());
+                if (isAdd(other) && flags.is(Flag.chainDamage)) {
                     act(mainPool, shapeRenderer, master, other.getCenter());
                 };
             });
         }
     }
 
-    @Override
-    public boolean isChainDamage() {
-        return flags.is(Flag.chainDamage);
+    private boolean isAdd(Health other) {
+        return other.setTargeted(targets.add(other));
     }
 
-    @Override
-    public boolean isStopOnFirstCollision() {
-        return flags.is(Flag.stopOnFirstCollision);
-    }
 
     public void setSelected(boolean selected) {
         isSelected = selected;

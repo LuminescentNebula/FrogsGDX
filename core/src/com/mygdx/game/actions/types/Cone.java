@@ -33,7 +33,6 @@ public class Cone extends BaseType {//Конус
                 new Vector2(other.getBounds().x+other.getBounds().width,other.getBounds().y+other.getBounds().height),
                 new Vector2(other.getBounds().x,other.getBounds().y+other.getBounds().height)}) {
             if (circle.contains(i) && tri.contains(i)) {
-                shapeRenderer.rect(other.getBounds().getX(), other.getBounds().getY(), other.getBounds().getWidth(), other.getBounds().getHeight());
                 return true;
             }
         }

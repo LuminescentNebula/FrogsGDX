@@ -20,9 +20,6 @@ import com.mygdx.game.actions.Fabric;
 import com.mygdx.game.actions.Flag;
 import com.mygdx.game.actions.Radius;
 import com.mygdx.game.actions.types.Catapult;
-import com.mygdx.game.actions.types.Cone;
-import com.mygdx.game.actions.types.Shot;
-import com.mygdx.game.actions.types.Target;
 import com.mygdx.game.interfaces.*;
 
 import java.util.ArrayList;
@@ -30,7 +27,6 @@ import java.util.LinkedList;
 
 public class Character extends Group implements Movable, Attackable, Health {
 
-    private boolean isSelected=false;
     private Image character,selection,characterProjection;
     public long timeStamp;
 
@@ -42,7 +38,20 @@ public class Character extends Group implements Movable, Attackable, Health {
 
     private int health;
     private int maxHealth=100;
-    private boolean targeted;
+    private boolean targeted=false;
+    private boolean selected=false;
+
+    public boolean isAttacking() {
+        return attacking;
+    }
+
+    public void setAttacking(boolean attacking,int index) {
+        this.attacking = attacking;
+        attacks.forEach((attack -> setSelected(false)));
+        attacks.get(index).setSelected(true);
+    }
+
+    private boolean attacking=false;
 
     private LinkedList<Move> pathPoints;
     private CharacterSelectionListener selectionListener;
@@ -65,6 +74,7 @@ public class Character extends Group implements Movable, Attackable, Health {
         selection.setVisible(false);
         selection.setName("Selection");
 
+
         //Проекция при движении
         characterProjection = new Image(texture);
         characterProjection.setSize(50,100);
@@ -79,7 +89,7 @@ public class Character extends Group implements Movable, Attackable, Health {
         health=100;
 
         Fabric fabric = new Fabric(
-                (byte)(Flag.checkNotMaster|Flag.stopOnFirstCollision|Flag.chainDamage),
+                (byte)(Flag.checkNotMaster),
                 new Catapult(),
                 0,350, Radius.LARGE, 10);
         attacks.add(fabric.build(this));
@@ -89,7 +99,7 @@ public class Character extends Group implements Movable, Attackable, Health {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (!selectionListener.isSelected()) {
-                    setSelected(!isSelected);
+                    setSelected(!selected);
                 }
                 return true;
             }
@@ -98,7 +108,13 @@ public class Character extends Group implements Movable, Attackable, Health {
 
     public void move(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool){
         if (isSelected()) {
-            Projection.calculateProjection(stage,shapeRenderer,this, mainPool);
+            if (attacking) {
+                act(stage,shapeRenderer,mainPool);
+            } else {
+                Projection.calculateProjection(stage, shapeRenderer, this, mainPool);
+            }
+
+
         }
 //        if (getDebug()){ //Отрисовка диагонали коллизии
 //            shapeRenderer.rectLine(getX(),getY(),getX()+getWidth(),getY()+getHeight(),10);
@@ -107,8 +123,7 @@ public class Character extends Group implements Movable, Attackable, Health {
 
     public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
         Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-
-        if (isSelected()) {
+        if (selected) {
             attacks.get(0).draw(shapeRenderer,getCenter(),cursor);
                 attacks.get(0).act(mainPool,shapeRenderer,this,cursor);
             if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
@@ -118,7 +133,7 @@ public class Character extends Group implements Movable, Attackable, Health {
     }
 
     public boolean isSelected() {
-        return isSelected;
+        return selected;
     }
 
     @Override
@@ -136,9 +151,15 @@ public class Character extends Group implements Movable, Attackable, Health {
     }
 
     @Override
+    public boolean setTargeted(boolean targeted) {
+        this.targeted=targeted;
+        selection.setVisible(targeted);
+        return targeted;
+    }
+
+    @Override
     public void setSelected(boolean selected) {
         selectionListener.setSelected(selected);
-
         timeStamp = TimeUtils.millis();
         pathPoints = new LinkedList<>();
 
@@ -146,8 +167,10 @@ public class Character extends Group implements Movable, Attackable, Health {
                 getX() + getWidth() / 2,
                 getY() + getHeight() / 2),0));
         currentAction = 0;
-        isSelected = selected;
+        this.selected = selected;
         selection.setVisible(selected);
+        attacking=false;
+        attacks.forEach((attack -> setSelected(false)));
     }
 
     @Override
@@ -254,12 +277,6 @@ public class Character extends Group implements Movable, Attackable, Health {
     @Override
     public void setMaxHealth(int maxHealth) {
         this.maxHealth=maxHealth;
-    }
-
-    @Override
-    public void setTargeted(boolean targeted) {
-        this.targeted=targeted;
-
     }
 
     @Override

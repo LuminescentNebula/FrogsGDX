@@ -11,11 +11,7 @@ public class Target extends BaseType {//Снаряд
 
     @Override
     public boolean check(Health other, ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, Circle circle) {
-        if (Intersector.overlaps(circle, other.getBounds())) {
-            shapeRenderer.circle(other.getCenterX(), other.getCenterY(), 50);
-            return true;
-        }
-        return false;
+        return Intersector.overlaps(circle, other.getBounds());
     }
 
     @Override
