@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.MainPool;
-import com.mygdx.game.actions.types.BaseType;
+import com.mygdx.game.actions.types.ActDrawInterface;
 import com.mygdx.game.interfaces.Attackable;
 import com.mygdx.game.interfaces.Health;
 
@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 public class Attack {
     private boolean isSelected=false;
     private Attackable master;
-    private BaseType type;
+    private ActDrawInterface type;
     private Flag flags;
     private float radius; //chainradius=radius
     private float minLength;
@@ -41,7 +41,11 @@ public class Attack {
 
     private static final Color areaColor=new Color(1,1,0,0.3f);
 
-    public Attack(Attackable master, BaseType type){
+    public ActDrawInterface getType() {
+        return type;
+    }
+
+    public Attack(Attackable master, ActDrawInterface type){
         this.master = master;
         this.type = type;
     }
