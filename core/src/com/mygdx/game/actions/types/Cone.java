@@ -2,8 +2,6 @@ package com.mygdx.game.actions.types;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
-import com.mygdx.game.AdvancedIntersector;
-import com.mygdx.game.actions.ActDrawInterface;
 import com.mygdx.game.interfaces.Health;
 
 public class Cone extends BaseType {//Конус
