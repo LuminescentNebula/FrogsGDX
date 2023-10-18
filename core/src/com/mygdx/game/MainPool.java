@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.game.interfaces.Collidable;
 import com.mygdx.game.interfaces.Health;
+import com.mygdx.game.interfaces.UIListener;
 import com.mygdx.game.pools.CharactersPool;
 import com.mygdx.game.pools.EnemyPool;
 import com.mygdx.game.pools.ObstaclesPool;
@@ -18,12 +19,13 @@ public class MainPool extends Group {
     private ObstaclesPool obstaclesPool;
     private EnemyPool enemyPool;
 
-    MainPool() {
+    MainPool(UIListener uiListener) {
         charactersPool = new CharactersPool();
+        charactersPool.setCharacterUIListener(uiListener);
         obstaclesPool = new ObstaclesPool();
         enemyPool = new EnemyPool();
         addActor(charactersPool);
-        addActor(obstaclesPool);
+        //addActor(obstaclesPool);
         addActor(enemyPool);
     }
 
@@ -43,7 +45,7 @@ public class MainPool extends Group {
     public ArrayList<Collidable> getCollidables() {
         return new ArrayList<Collidable>() {{
             addAll(charactersPool.getActors());
-            addAll(obstaclesPool.getActors());
+            //addAll(obstaclesPool.getActors());
             addAll(enemyPool.getActors());
         }};
     }
@@ -54,4 +56,6 @@ public class MainPool extends Group {
             //addAll(enemyPool.getActors());
         }};
     }
+
+
 }

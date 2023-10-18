@@ -16,6 +16,7 @@ public class GameScreen implements Screen {
     private ShapeRenderer shapeRenderer;
     private Image background;
     private MainPool mainPool;
+    private UserInterface UI;
 
     public GameScreen() {
         stage = new Stage(new FitViewport(1024, 512)); //Размер viewport
@@ -26,17 +27,26 @@ public class GameScreen implements Screen {
         shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
         Gdx.input.setInputProcessor(stage);
 
-        // Create images
+        UI = new UserInterface();
+        UI.setBounds(0,0,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        UI.build();
+
+        mainPool = new MainPool(UI);
+
+
+        //Create images
         background = new Image(new Texture(Gdx.files.internal("background.png")));
         background.setName("Background");
 
+
         // Add actors to stage
         stage.addActor(background);
-
-        mainPool = new MainPool();
         stage.addActor(mainPool);
+        stage.addActor(UI);
         System.out.println(stage.getActors());
     }
+
+
 
     @Override
     public void show() {}

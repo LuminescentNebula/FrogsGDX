@@ -75,32 +75,33 @@ public class Projection {
     public static void calculateProjection(Stage stage, ShapeRenderer shapeRenderer, Movable movable, MainPool mainPool){
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+            if (cursor.y<=Gdx.graphics.getHeight()-75) { //TODO: Костыль для проверки, что нажатие в верхней части, где кнопки
+                //Проверка, что не слишком быстро и не слишком быстро после выделения
+                if (cursor.dst(movable.getPathPoints().getFirst().vector) > MIN_DISTANCE &&
+                        cursor.dst(movable.getPathPoints().getLast().vector) > MIN_DISTANCE &&
+                        Math.abs(movable.getTimestamp() - TimeUtils.millis()) > MIN_TIME_DIFFERENCE) {
+                    int action = checkDirection(new Vector2(movable.getProjection().getX() + movable.getWidth() / 2,
+                                    movable.getProjection().getY() + movable.getHeight() / 2),
+                            movable.getPathPoints().getLast().vector, movable);
+                    cursor.sub(movable.getWidth() / 2, movable.getHeight() / 2);
 
-            //Проверка, что не слишком быстро и не слишком быстро после выделения
-            if (cursor.dst(movable.getPathPoints().getFirst().vector) > MIN_DISTANCE  &&
-                    cursor.dst(movable.getPathPoints().getLast().vector) > MIN_DISTANCE &&
-                    Math.abs(movable.getTimestamp() - TimeUtils.millis())>MIN_TIME_DIFFERENCE) {
-                int action=checkDirection(new Vector2(movable.getProjection().getX()+movable.getWidth()/2,
-                        movable.getProjection().getY()+movable.getHeight()/2),
-                        movable.getPathPoints().getLast().vector,movable);
-                cursor.sub(movable.getWidth() / 2, movable.getHeight() / 2);
+                    if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                        movable.getPathPoints().add(new Move(
+                                movable.getProjection().getX() + movable.getWidth() / 2,
+                                movable.getProjection().getY() + movable.getHeight() / 2,
+                                action));
+                        System.out.println(movable.getPathPoints());
+                        draw(stage, movable, shapeRenderer, mainPool);
 
-                if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                    movable.getPathPoints().add(new Move(
-                            movable.getProjection().getX()+movable.getWidth()/2,
-                            movable.getProjection().getY()+movable.getHeight()/2,
-                            action));
-                    System.out.println(movable.getPathPoints());
-                    draw(stage, movable, shapeRenderer, mainPool);
-
+                    } else {
+                        movable.addAction(movable.getCurrentAction());
+                        System.out.println(movable.getAction());
+                        movable.setPosition(movable.getProjection().getX(), movable.getProjection().getY());
+                        movable.setSelected(false);
+                    }
                 } else {
-                    movable.addAction(movable.getCurrentAction());
-                    System.out.println(movable.getAction());
-                    movable.setPosition(movable.getProjection().getX(), movable.getProjection().getY());
-                    movable.setSelected(false);
+                    draw(stage, movable, shapeRenderer, mainPool);
                 }
-            } else {
-                draw(stage, movable, shapeRenderer, mainPool);
             }
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             movable.addAction(movable.getCurrentAction());

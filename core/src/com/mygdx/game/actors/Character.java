@@ -40,17 +40,6 @@ public class Character extends Group implements Movable, Attackable, Health {
     private int maxHealth=100;
     private boolean targeted=false;
     private boolean selected=false;
-
-    public boolean isAttacking() {
-        return attacking;
-    }
-
-    public void setAttacking(boolean attacking,int index) {
-        this.attacking = attacking;
-        attacks.forEach((attack -> setSelected(false)));
-        attacks.get(index).setSelected(true);
-    }
-
     private boolean attacking=false;
 
     private LinkedList<Move> pathPoints;
@@ -58,6 +47,29 @@ public class Character extends Group implements Movable, Attackable, Health {
 
     private Rectangle bounds = new Rectangle();
     private final int ID;
+
+
+
+    public boolean isAttacking() {
+        return attacking;
+    }
+
+    public void setAttacking(){
+        setAttacking(false,-1);
+    }
+
+    public void setAttacking(int index){
+        setAttacking(true,index);
+    }
+    public void setAttacking(boolean attacking,int index) {
+        this.attacking = attacking;
+        System.out.println(attacking);
+        attacks.forEach((attack -> attack.setSelected(false)));
+        if (attacking) {
+            attacks.get(index).setSelected(true);
+        }
+    }
+
 
     public Character(int ID){
         Texture texture = new Texture(Gdx.files.internal("character.png"));
@@ -94,13 +106,10 @@ public class Character extends Group implements Movable, Attackable, Health {
                 0,350, Radius.LARGE, 10);
         attacks.add(fabric.build(this));
 
-        //Слушатель для выделения персонажа
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (!selectionListener.isSelected()) {
-                    setSelected(!selected);
-                }
+                setSelected(!selected);
                 return true;
             }
         });
@@ -108,13 +117,12 @@ public class Character extends Group implements Movable, Attackable, Health {
 
     public void move(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool){
         if (isSelected()) {
+            //System.out.println(attacking);
             if (attacking) {
                 act(stage,shapeRenderer,mainPool);
             } else {
                 Projection.calculateProjection(stage, shapeRenderer, this, mainPool);
             }
-
-
         }
 //        if (getDebug()){ //Отрисовка диагонали коллизии
 //            shapeRenderer.rectLine(getX(),getY(),getX()+getWidth(),getY()+getHeight(),10);
@@ -122,12 +130,16 @@ public class Character extends Group implements Movable, Attackable, Health {
     }
 
     public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
-        Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-        if (selected) {
-            attacks.get(0).draw(shapeRenderer,getCenter(),cursor);
-                attacks.get(0).act(mainPool,shapeRenderer,this,cursor);
-            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                //attacks.get(0).deal();
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+            setSelected(!selected);
+        } else {
+            Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+            if (selected) {
+                attacks.get(0).draw(shapeRenderer, getCenter(), cursor);
+                attacks.get(0).act(mainPool, shapeRenderer, this, cursor);
+                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                    //attacks.get(0).deal();
+                }
             }
         }
     }
@@ -159,19 +171,46 @@ public class Character extends Group implements Movable, Attackable, Health {
 
     @Override
     public void setSelected(boolean selected) {
-        selectionListener.setSelected(selected);
         timeStamp = TimeUtils.millis();
         pathPoints = new LinkedList<>();
 
         pathPoints.add(new Move(new Vector2(
                 getX() + getWidth() / 2,
-                getY() + getHeight() / 2),0));
+                getY() + getHeight() / 2), 0));
         currentAction = 0;
         this.selected = selected;
         selection.setVisible(selected);
-        attacking=false;
-        attacks.forEach((attack -> setSelected(false)));
+        if (!selected) {
+            attacking = false;
+            attacks.forEach((attack -> attack.setSelected(false)));
+        }
+        try {
+            selectionListener.setSelected(selected);
+        } catch (NullPointerException e){
+            System.out.println("Selection listener is not set");
+        }
     }
+
+    public void setSelectionListener(CharacterSelectionListener selectionListener) {
+        this.selectionListener = selectionListener;
+        //Слушатель для выделения персонажа
+        removeListener(getListeners().get(0));
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (!selectionListener.isSelected()) {
+                    setSelected(!selected);
+                    System.out.println(selected);
+                    selectionListener.setSelected(selected);
+                    selectionListener.sendAttacks(attacks);
+                }
+                return true;
+            }
+        });
+    }
+
+
+
 
     @Override
     public long getTimestamp() {
@@ -186,10 +225,6 @@ public class Character extends Group implements Movable, Attackable, Health {
     @Override
     public float getHeight() {
         return character.getHeight();
-    }
-
-    public void setSelectionListener(CharacterSelectionListener selectionListener) {
-        this.selectionListener = selectionListener;
     }
 
     @Override
