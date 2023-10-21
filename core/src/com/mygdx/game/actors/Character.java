@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -19,7 +20,7 @@ import com.mygdx.game.actions.Attack;
 import com.mygdx.game.actions.Fabric;
 import com.mygdx.game.actions.Flag;
 import com.mygdx.game.actions.Radius;
-import com.mygdx.game.actions.types.Catapult;
+import com.mygdx.game.actions.types.*;
 import com.mygdx.game.interfaces.*;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class Character extends Group implements Movable, Attackable, Health {
     protected int currentAction;          //Действие, которое выполняется в текущем выделении персонажа
 
     ArrayList<Attack> attacks = new ArrayList<>();
+    private int activeAttack=-1;
 
     private int health;
     private int maxHealth=100;
@@ -47,8 +49,6 @@ public class Character extends Group implements Movable, Attackable, Health {
 
     private Rectangle bounds = new Rectangle();
     private final int ID;
-
-
 
     public boolean isAttacking() {
         return attacking;
@@ -65,6 +65,7 @@ public class Character extends Group implements Movable, Attackable, Health {
         this.attacking = attacking;
         System.out.println(attacking);
         attacks.forEach((attack -> attack.setSelected(false)));
+        activeAttack=index;
         if (attacking) {
             attacks.get(index).setSelected(true);
         }
@@ -100,10 +101,26 @@ public class Character extends Group implements Movable, Attackable, Health {
 
         health=100;
 
-        Fabric fabric = new Fabric(
-                (byte)(Flag.checkNotMaster),
-                new Catapult(),
-                0,350, Radius.LARGE, 10);
+
+        Fabric fabric = new Fabric()
+                .setFlags((byte)(Flag.checkNotMaster));
+
+                fabric.addType(new Type() {
+                    @Override
+                    public boolean check(Health other, Vector2 master, Vector2 cursor, Circle circle) {
+                        return Acts.acts[1].check(other, master, cursor, circle);
+                    }
+
+                    @Override
+                    public void draw(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+                        Draws.draws[2].draw(shapeRenderer,master,cursor,minLength,maxLength,radius);
+                    }
+                }).setLength(0,100).setRadius(Radius.LARGE).setDamage(10);
+
+
+
+
+
         attacks.add(fabric.build(this));
 
         addListener(new InputListener() {
@@ -135,8 +152,7 @@ public class Character extends Group implements Movable, Attackable, Health {
         } else {
             Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
             if (selected) {
-                attacks.get(0).draw(shapeRenderer, getCenter(), cursor);
-                attacks.get(0).act(mainPool, shapeRenderer, this, cursor);
+                attacks.get(activeAttack).check(shapeRenderer, this, cursor, mainPool);
                 if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
                     //attacks.get(0).deal();
                 }

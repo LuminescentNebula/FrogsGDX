@@ -1,50 +1,44 @@
 package com.mygdx.game.actions;
 
-import com.mygdx.game.actions.types.BaseType;
+import com.mygdx.game.actions.types.Type;
 import com.mygdx.game.interfaces.Attackable;
+
+import java.util.ArrayList;
 
 public class Fabric {
 
-    private BaseType attackType;
-    private Flag flags;
-    private float minLength,maxLength,radius;
-    private int damage;
+    private Flag flags=new Flag();
+    private ArrayList<Type> types=  new ArrayList<>();
 
-    public Fabric(byte flags, BaseType attackType, float minLength, float maxLength, float radius, int damage){
-        this.flags=new Flag(flags);
-        this.attackType= attackType;
-        this.minLength=minLength;
-        this.maxLength=maxLength;
-        this.radius=radius;
-        this.damage=damage;
+    public Fabric(){
+
     }
-    public Attack build(Attackable master){
-        Attack attack = new Attack(master,attackType);
+
+    public Fabric setTypes(ArrayList<Type> types) {
+        this.types=types;
+        return this;
+    }
+
+    public Type addType(Type type){
+        types.add(type);
+        return type;
+    }
+
+    public Attack  build(Attackable master){
+        Attack attack = new Attack();
+        attack.setMaster(master);
+        attack.setTypes(types);
         attack.setFlags(flags);
-        attack.setMinLength(minLength);
-        attack.setMaxLength(maxLength);
-        attack.setRadius(radius);
-        attack.setDamage(damage);
         return attack;
     }
 
-    public void setFlags(byte flags){
+    public Fabric setFlags(byte flags){
         this.flags=new Flag(flags);
+        return this;
     }
-    public void addFlag(byte flag){
+    public Fabric addFlag(byte flag){
         this.flags.add(flag);
-    }
-    public void setAttackType(BaseType attackType){
-        this.attackType= attackType;
-    }
-    public void setLength(float minLength,float maxLength){
-
-    }
-    public void setRadius(float radius){
-
-    }
-    public void setDamage(int damage){
-
+        return this;
     }
 
 }

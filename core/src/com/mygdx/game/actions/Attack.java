@@ -11,10 +11,15 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.MainPool;
 import com.mygdx.game.actions.types.ActDrawInterface;
+import com.mygdx.game.actions.types.ActInterface;
+import com.mygdx.game.actions.types.DrawInterface;
+import com.mygdx.game.actions.types.Type;
 import com.mygdx.game.interfaces.Attackable;
 import com.mygdx.game.interfaces.Health;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -31,117 +36,109 @@ import java.util.stream.Stream;
 public class Attack {
     private boolean isSelected=false;
     private Attackable master;
-    private ActDrawInterface type;
+
+    private ArrayList<Type> types;
     private Flag flags;
-    private float radius; //chainradius=radius
-    private float minLength;
-    private float maxLength;
-    private int damage = 10;
+//    private float radius; //chainradius=radius
+//    private float minLength;
+//    private float maxLength;
+//    private int damage = 10;
     private Set<Health> targets = new HashSet<>();
+    boolean chainChecking = false; //Temporal while chain checking
 
-    private static final Color areaColor=new Color(1,1,0,0.3f);
+    public static final Color areaColor=new Color(1,1,0,0.3f);
 
-    public ActDrawInterface getType() {
-        return type;
+    public Attack(){;
     }
 
-    public Attack(Attackable master, ActDrawInterface type){
-        this.master = master;
-        this.type = type;
+    public void setTypes(ArrayList<Type> types) {
+        this.types = types;
     }
 
-    private void deal(){
-        for (Health target: targets) {
-            target.dealHealth(damage);
+    public void check(ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor,MainPool mainPool){
+        for (Type type : types ){
+            draw(type::draw,shapeRenderer,master.getCenter(),cursor, type.getMinLength(),type.getMaxLength(),type.getRadius());
+            act(type::check,mainPool,shapeRenderer,master,cursor, type.getMinLength(),type.getMaxLength(),type.getRadius());
         }
     }
 
-    public void draw(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor){
+//    private void deal(){
+//        for (Health target: targets) {
+//            target.dealHealth(damage);
+//        }
+//    }
+
+    public void draw(DrawInterface drawInterface, ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         Gdx.gl.glEnable(GL30.GL_BLEND);
         Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
 
-        type.draw(shapeRenderer,master,cursor, minLength, maxLength,radius);
+        drawInterface.draw(shapeRenderer,master,cursor,minLength,maxLength,radius);
         flushTargets();
     }
 
     private void flushTargets() {
+        System.out.print("{");
         for (Health health:targets) {
+            System.out.print(health.getId()+" ");
             health.setTargeted(false);
         }
+        System.out.print("}\n");
         targets = new HashSet<>();
     }
 
-    public void act(MainPool mainPool, ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor) {
-
+    public void act(ActInterface actInterface, MainPool mainPool, ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor, float minLength, float maxLength, float radius) {
         shapeRenderer.setColor(new Color(areaColor));
-
-        shapeRenderer.set(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.circle(cursor.x, cursor.y, radius);
-        shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
 
         Stream<Health> stream = mainPool.getHealths().stream();
         if (flags.is(Flag.checkNotMaster)) {
             stream = (stream.filter(other -> master.getId() != other.getId()));
         }
-        if (flags.is(Flag.chainChecking)) {
-            stream = stream.filter(other -> type.chainCheck(other, shapeRenderer,
+
+        if (chainChecking) {  //Для вызовов, которые проверяют цепочки
+            stream = stream.filter(other -> Type.chainCheck(other, shapeRenderer,
                     new Circle(cursor, radius)));
-        } else {
-            stream = stream.filter(other -> type.check(other, shapeRenderer, master.getCenter(), cursor,
+        } else { //Проверяем коллизию для всех остальных
+            stream = stream.filter(other -> actInterface.check(other, master.getCenter(), cursor,
                     new Circle(cursor, radius)));
         }
-        if (flags.is(Flag.stopOnFirstCollision)) {
+
+        if (flags.is(Flag.stopOnFirstCollision)) { //Если есть stop onFirstCollision, то добавляется только первая найденная цель
             flags.del(Flag.stopOnFirstCollision);
-            flags.add(Flag.chainChecking);
-            stream.findFirst().ifPresent(other -> {
-                if (isAdd(other) && flags.is(Flag.chainDamage)) act(mainPool, shapeRenderer, master, other.getCenter());
-            });
-            flags.del(Flag.chainChecking);
+            chainChecking=true;
+            stream.findFirst().ifPresent(other -> { //Если есть chainDamage, то вызывается act, но с удаленным stopOnFirst и отметкой chainChecking, что идет проверка цепи
+                if (isAdd(other) && flags.is(Flag.chainDamage)) act(actInterface, mainPool, shapeRenderer, master, other.getCenter(), minLength, maxLength, radius);
+            }); //Цепочка тоже начинается только от первой цели
+            chainChecking=false;
             flags.add(Flag.stopOnFirstCollision);
         } else {
-            stream.forEach(other -> {
+            stream.forEach(other -> { //Цепочка начинается от каждой цели
                 if (isAdd(other) && flags.is(Flag.chainDamage)) {
-                    act(mainPool, shapeRenderer, master, other.getCenter());
+                    act(actInterface,mainPool, shapeRenderer, master, other.getCenter(), minLength, maxLength, radius);
                 };
             });
         }
     }
-
+    /**
+     * Trying to add given Health object should and return success of operation.
+     *
+     * @param  other  the Health object to be added
+     * @return        true if the Health object was successfully added, otherwise false
+     */
     private boolean isAdd(Health other) {
-        return other.setTargeted(targets.add(other));
+        if (targets.add(other)){
+            other.setTargeted(true);
+            return true;
+        }
+        return false;
     }
-
-
     public void setSelected(boolean selected) {
         isSelected = selected;
     }
-
     public void setMaster(Attackable master) {
         this.master = master;
     }
-
     public void setFlags(Flag flags) {
         this.flags = flags;
-    }
-
-    public void setRadius(float radius) {
-        this.radius = radius;
-    }
-
-    public void setMinLength(float minLength) {
-        this.minLength = minLength;
-    }
-
-    public void setMaxLength(float maxLength) {
-        this.maxLength = maxLength;
-    }
-
-    public void setDamage(int damage) {
-        this.damage = damage;
-    }
-
-    public void setTargets(Set<Health> targets) {
-        this.targets = targets;
     }
 }
