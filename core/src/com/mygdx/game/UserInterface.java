@@ -65,7 +65,7 @@ public class UserInterface extends Group implements UIListener, CharacterUIListe
     public void showControls(ArrayList<Attack> attacks) {
         buttonTable.clear();
         for (int i=0;i< attacks.size();i++) {
-            Button button = new TextButton(attacks.get(i).getType().toString(), VisUI.getSkin());
+            Button button = new TextButton(attacks.get(i).toString(), VisUI.getSkin());
             int id=i;
             buttonTable.add(button).expand();
             button.addListener(new ClickListener() {

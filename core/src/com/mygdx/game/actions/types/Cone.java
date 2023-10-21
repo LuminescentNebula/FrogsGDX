@@ -2,16 +2,17 @@ package com.mygdx.game.actions.types;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
+import com.mygdx.game.actions.Attack;
 import com.mygdx.game.interfaces.Health;
 
-public class Cone extends BaseType {//Конус
-
+public class Cone extends Type {//Конус
+    //FIXME: IMPLEMENT ME!!
     float radius,angle;
     protected final static float coneArcSize = 53;
     
 
     @Override
-    public boolean check(Health other, ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, Circle circle) {
+    public boolean check(Health other, Vector2 master, Vector2 cursor, Circle circle) {
         circle = new Circle(master,radius+1);
 
         Vector2 direction = cursor.cpy().sub(master);
@@ -55,6 +56,8 @@ public class Cone extends BaseType {//Конус
         radius = cursor.dst(master);
         this.radius = radius;
         this.angle = angle;
+
+        shapeRenderer.setColor(Attack.areaColor);
         shapeRenderer.arc(
                 master.x, master.y,
                 cursor.dst(master),
