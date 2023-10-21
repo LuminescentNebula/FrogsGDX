@@ -80,7 +80,7 @@ public class Projection {
                 if (cursor.dst(movable.getPathPoints().getFirst().vector) > MIN_DISTANCE &&
                         cursor.dst(movable.getPathPoints().getLast().vector) > MIN_DISTANCE &&
                         Math.abs(movable.getTimestamp() - TimeUtils.millis()) > MIN_TIME_DIFFERENCE) {
-                    int action = checkDirection(new Vector2(movable.getProjection().getX() + movable.getWidth() / 2,
+                    float action = checkDirection(new Vector2(movable.getProjection().getX() + movable.getWidth() / 2,
                                     movable.getProjection().getY() + movable.getHeight() / 2),
                             movable.getPathPoints().getLast().vector, movable);
                     cursor.sub(movable.getWidth() / 2, movable.getHeight() / 2);
@@ -124,10 +124,10 @@ public class Projection {
 
     //point1 - cursor
     //point2 - center
-    private static int checkDirection(Vector2 cursor, Vector2 center, Movable character){
+    private static float checkDirection(Vector2 cursor, Vector2 center, Movable character){
         Vector2 direction = cursor.cpy().sub(center);
         direction.limit(Projection.MAX_LINE_LENGTH);
-        int n=0;
+        float n=0;
         if (character.getAction() +character.getCurrentAction()+ direction.len() <= character.getMaxAction()) {
              n+= direction.len();
         } else {

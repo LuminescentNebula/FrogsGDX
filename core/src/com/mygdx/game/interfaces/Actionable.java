@@ -5,11 +5,11 @@ import com.mygdx.game.Move;
 import java.util.LinkedList;
 
 public interface Actionable extends Collidable, Imagable {
-    int getMaxAction();
-    int getAction();
-    void setAction(int action);
+    float getMaxAction();
+    float getAction();
+    void setAction(float action);
     void addAction(float action);
-    int getCurrentAction();
+    float getCurrentAction();
 
     void setSelected(boolean selected);
 

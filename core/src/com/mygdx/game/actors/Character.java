@@ -32,8 +32,8 @@ public class Character extends Group implements Movable, Attackable, Health {
     public long timeStamp;
 
     protected final int maxAction=1000;   //Максимальное действие, которе можно совершить за раунд
-    protected int action=0;               //Действие, которе было выполнено в текущем раунде
-    protected int currentAction;          //Действие, которое выполняется в текущем выделении персонажа
+    protected float action=0;               //Действие, которе было выполнено в текущем раунде
+    protected float currentAction;          //Действие, которое выполняется в текущем выделении персонажа
 
     ArrayList<Attack> attacks = new ArrayList<>();
     private int activeAttack=-1;
@@ -244,17 +244,17 @@ public class Character extends Group implements Movable, Attackable, Health {
     }
 
     @Override
-    public int getMaxAction() {
+    public float getMaxAction() {
         return maxAction;
     }
 
     @Override
-    public int getAction() {
+    public float getAction() {
         return action;
     }
 
     @Override
-    public void setAction(int action) {
+    public void setAction(float action) {
         this.action=action;
     }
 
@@ -264,7 +264,7 @@ public class Character extends Group implements Movable, Attackable, Health {
     }
 
     @Override
-    public int getCurrentAction() {
+    public float getCurrentAction() {
         return currentAction;
     }
 
