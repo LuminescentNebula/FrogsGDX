@@ -10,17 +10,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.MainPool;
-import com.mygdx.game.actions.types.ActDrawInterface;
-import com.mygdx.game.actions.types.ActInterface;
-import com.mygdx.game.actions.types.DrawInterface;
-import com.mygdx.game.actions.types.Type;
+import com.mygdx.game.actions.types.*;
 import com.mygdx.game.interfaces.Attackable;
 import com.mygdx.game.interfaces.Health;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 //TODO:Нужно рисовать зону поражения в act
@@ -43,7 +37,8 @@ public class Attack {
 //    private float minLength;
 //    private float maxLength;
 //    private int damage = 10;
-    private Set<Health> targets = new HashSet<>();
+    //TODO: Переместить в Type
+    private Set<Health> targets = new LinkedHashSet<>();
     boolean chainChecking = false; //Temporal while chain checking
 
     public static final Color areaColor=new Color(1,1,0,0.3f);
@@ -57,8 +52,9 @@ public class Attack {
 
     public void check(ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor,MainPool mainPool){
         for (Type type : types ){
+            type.performPre(master.getCenter(),cursor,mainPool);
             draw(type::draw,shapeRenderer,master.getCenter(),cursor, type.getMinLength(),type.getMaxLength(),type.getRadius());
-            act(type::check,mainPool,shapeRenderer,master,cursor, type.getMinLength(),type.getMaxLength(),type.getRadius());
+            act(type::check,mainPool,shapeRenderer,master,cursor,type.getRadius());
         }
     }
 
@@ -77,7 +73,7 @@ public class Attack {
         flushTargets();
     }
 
-    private void flushTargets() {
+    public void flushTargets() {
         System.out.print("{");
         for (Health health:targets) {
             System.out.print(health.getId()+" ");
@@ -87,8 +83,9 @@ public class Attack {
         targets = new HashSet<>();
     }
 
-    public void act(ActInterface actInterface, MainPool mainPool, ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor, float minLength, float maxLength, float radius) {
+    public void act(ActInterface actInterface, MainPool mainPool, ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor, float radius) {
         shapeRenderer.setColor(new Color(areaColor));
+
 
         Stream<Health> stream = mainPool.getHealths().stream();
         if (flags.is(Flag.checkNotMaster)) {
@@ -107,14 +104,14 @@ public class Attack {
             flags.del(Flag.stopOnFirstCollision);
             chainChecking=true;
             stream.findFirst().ifPresent(other -> { //Если есть chainDamage, то вызывается act, но с удаленным stopOnFirst и отметкой chainChecking, что идет проверка цепи
-                if (isAdd(other) && flags.is(Flag.chainDamage)) act(actInterface, mainPool, shapeRenderer, master, other.getCenter(), minLength, maxLength, radius);
+                if (isAdd(other) && flags.is(Flag.chainDamage)) act(actInterface, mainPool, shapeRenderer, master, other.getCenter(), radius);
             }); //Цепочка тоже начинается только от первой цели
             chainChecking=false;
             flags.add(Flag.stopOnFirstCollision);
         } else {
             stream.forEach(other -> { //Цепочка начинается от каждой цели
                 if (isAdd(other) && flags.is(Flag.chainDamage)) {
-                    act(actInterface,mainPool, shapeRenderer, master, other.getCenter(), minLength, maxLength, radius);
+                    act(actInterface,mainPool, shapeRenderer, master, other.getCenter(), radius);
                 };
             });
         }

@@ -13,7 +13,6 @@ public abstract class Draws {
             Draws::drawCircle,
     };
 
-
     private static void drawCatapult(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(1,1,1, 1);
@@ -28,11 +27,15 @@ public abstract class Draws {
         drawCircle(shapeRenderer, master, cursor, minLength, maxLength, radius);
     }
     private static void drawShot(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
-        clamp(master,cursor,minLength,maxLength);
+        clamp(master, cursor, minLength, maxLength);
         Vector2 vec2 = new Vector2(cursor).sub(new Vector2(master));
-        for (int i = 0; i <=10; i += 1) {
-            shapeRenderer.circle(master.x + vec2.x*i/10, master.y + vec2.y*i/10, 5);
+        for (int i = 0; i <= 10; i += 1) {
+            shapeRenderer.circle(master.x + vec2.x * i / 10, master.y + vec2.y * i / 10, 5);
         }
+    }
+    private static void drawLightning(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+        //TODO
+        //Молния, которая бьёт по прямой и искажается каждый кадр или несколько
     }
     private static void drawThroughShot(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         clamp(master,cursor,minLength,maxLength);
@@ -50,6 +53,9 @@ public abstract class Draws {
     }
     private static void drawTarget(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         shapeRenderer.x(cursor,25);
+        //TODO |
+        //   -- --
+        //     |
     }
 
 

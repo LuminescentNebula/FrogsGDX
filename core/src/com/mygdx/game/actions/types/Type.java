@@ -3,14 +3,16 @@ package com.mygdx.game.actions.types;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
-import com.mygdx.game.actions.Flag;
+import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.MainPool;
 import com.mygdx.game.actions.Length;
 import com.mygdx.game.actions.Radius;
 import com.mygdx.game.interfaces.Health;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 
 public abstract class Type implements ActInterface,DrawInterface {
 
-    private Flag flags=new Flag();
+    //TODO: flags and other modificators
     private float minLength= Length.NONE,
             maxLength= Length.LARGE,
             radius= Radius.NONE;
@@ -19,17 +21,21 @@ public abstract class Type implements ActInterface,DrawInterface {
     public Type(){
     }
 
+    public void performPre(Vector2 master, Vector2 cursor, MainPool mainPool){
+//        Mods.rotate(cursor, master, 0);
+//        Mods.translateRotated(cursor,master,new Vector2(50,0));
+    }
+    public void performAfter(Vector2 master, Vector2 cursor, MainPool mainPool){
+//        Mods.rotate(cursor, master, 0);
+//        Mods.translateRotated(cursor,master,new Vector2(50,0));
+    }
+
     public static boolean chainCheck(Health other, ShapeRenderer shapeRenderer, Circle circle){
         if (Intersector.overlaps(circle, other.getBounds())) {
             shapeRenderer.circle(other.getCenterX(), other.getCenterY(), 50);
             return true;
         }
         return false;
-    }
-
-
-    public Flag getFlags() {
-        return flags;
     }
 
     public float getMinLength() {

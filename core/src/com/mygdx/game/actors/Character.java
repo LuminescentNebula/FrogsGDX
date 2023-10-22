@@ -54,7 +54,7 @@ public class Character extends Group implements Movable, Attackable, Health {
         return attacking;
     }
 
-    public void setAttacking(){
+    public void stopAttacking(){
         setAttacking(false,-1);
     }
 
@@ -64,7 +64,10 @@ public class Character extends Group implements Movable, Attackable, Health {
     public void setAttacking(boolean attacking,int index) {
         this.attacking = attacking;
         System.out.println(attacking);
-        attacks.forEach((attack -> attack.setSelected(false)));
+        attacks.forEach((attack -> {
+            attack.setSelected(false);
+            attack.flushTargets();
+        }));
         activeAttack=index;
         if (attacking) {
             attacks.get(index).setSelected(true);
@@ -72,25 +75,25 @@ public class Character extends Group implements Movable, Attackable, Health {
     }
 
 
-    public Character(int ID){
+    public Character(int ID) {
         Texture texture = new Texture(Gdx.files.internal("character.png"));
-        this.ID=ID;
+        this.ID = ID;
         //Сам персонаж
         character = new Image(texture);
-        character.setSize(50,100);
+        character.setSize(50, 100);
         character.setName("Character");
 
         //То, что появляется при выделении
         //TODO: Зеленым при выделении и Красным при атаке
         selection = new Image(new Texture(Gdx.files.internal("selection.png")));
-        selection.setSize(50,100);
+        selection.setSize(50, 100);
         selection.setVisible(false);
         selection.setName("Selection");
 
 
         //Проекция при движении
         characterProjection = new Image(texture);
-        characterProjection.setSize(50,100);
+        characterProjection.setSize(50, 100);
         characterProjection.setVisible(false);
         characterProjection.setName("Projection");
 
@@ -99,27 +102,23 @@ public class Character extends Group implements Movable, Attackable, Health {
         addActor(selection);
         addActor(characterProjection);
 
-        health=100;
+        health = 100;
 
 
         Fabric fabric = new Fabric()
-                .setFlags((byte)(Flag.checkNotMaster));
+                .setFlags((byte) (Flag.checkNotMaster));
 
-                fabric.addType(new Type() {
-                    @Override
-                    public boolean check(Health other, Vector2 master, Vector2 cursor, Circle circle) {
-                        return Acts.acts[1].check(other, master, cursor, circle);
-                    }
-
-                    @Override
-                    public void draw(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
-                        Draws.draws[2].draw(shapeRenderer,master,cursor,minLength,maxLength,radius);
-                    }
-                }).setLength(0,100).setRadius(Radius.LARGE).setDamage(10);
-
-
-
-
+//        fabric.addType(new Type() {
+//            @Override
+//            public boolean check(Health other, Vector2 master, Vector2 cursor, Circle circle) {
+//                return Acts.acts[0].check(other, master, cursor, circle);
+//            }
+//            @Override
+//            public void draw(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+//                Draws.draws[0].draw(shapeRenderer, master, cursor, minLength, maxLength, radius);
+//            }
+//        }).setLength(0, 500).setRadius(Radius.LARGE).setDamage(10);
+        //fabric.addType(new Cone()).setLength(0, 100).setRadius(Radius.LARGE).setDamage(10);
 
         attacks.add(fabric.build(this));
 
@@ -149,6 +148,7 @@ public class Character extends Group implements Movable, Attackable, Health {
     public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
         if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
             setSelected(!selected);
+            stopAttacking();
         } else {
             Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
             if (selected) {
@@ -182,6 +182,7 @@ public class Character extends Group implements Movable, Attackable, Health {
     public boolean setTargeted(boolean targeted) {
         this.targeted=targeted;
         selection.setVisible(targeted);
+        selection.setColor(1,0,0,0.5f);
         return targeted;
     }
 
@@ -196,6 +197,7 @@ public class Character extends Group implements Movable, Attackable, Health {
         currentAction = 0;
         this.selected = selected;
         selection.setVisible(selected);
+        selection.setColor(1,1,0,0.5f);
         if (!selected) {
             attacking = false;
             attacks.forEach((attack -> attack.setSelected(false)));
