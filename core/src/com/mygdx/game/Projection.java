@@ -17,10 +17,11 @@ public class Projection {
 
 
     private static boolean calculateIntersection(Movable movable, MainPool mainPool, Vector2 cursor){
+        Vector2 intersection = new Vector2();
+        AlignmentPack alignmentPack = new AlignmentPack();
+
         for (Collidable other : mainPool.getCollidables()) {
             if (other.getId()!=movable.getId()) {
-                Vector2 intersection = new Vector2();
-                AlignmentPack alignmentPack = new AlignmentPack();
 
                 if (AdvancedIntersector.intersectSegmentRectangle(
                         movable.getPathPoints().getLast().vector,

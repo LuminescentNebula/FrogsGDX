@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.MainPool;
 import com.mygdx.game.actions.types.*;
 import com.mygdx.game.interfaces.Attackable;
+import com.mygdx.game.interfaces.DrawInterface;
 import com.mygdx.game.interfaces.Health;
 
 import java.util.*;
@@ -24,8 +25,6 @@ public class Attack {
     private Attackable master;
 
     private ArrayList<Type> types;
-    private Flag flags;
-
     boolean chainChecking = false; //Temporal while chain checking
 
     public static final Color areaColor=new Color(1,1,0,0.3f);
@@ -41,9 +40,10 @@ public class Attack {
         shapeRenderer.setColor(new Color(areaColor));
         flushTargets();
         for (Type type : types ){
-            type.performPre(master.getCenter(),cursor,mainPool);
-            draw(type::draw,shapeRenderer,master.getCenter(),cursor, type.getMinLength(),type.getMaxLength(),type.getRadius());
+            type.performPre(master,cursor,mainPool);
+            draw(type,shapeRenderer,master.getCenter(),cursor, type.getMinLength(),type.getMaxLength(),type.getRadius());
             act(type,mainPool,shapeRenderer,master,cursor,type.getRadius());
+            type.performAfter(master,cursor,mainPool);
         }
     }
 
@@ -66,34 +66,31 @@ public class Attack {
     }
 
     public void act(Type type, MainPool mainPool, ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor, float radius) {
-
         Stream<Health> stream = mainPool.getHealths().stream();
-        stream =stream.sorted(Comparator.comparing(health -> {
-            return health.getCenter().dst(master.getCenter());
-        }));
-        if (flags.is(Flag.checkNotMaster)) {
+        if (type.flags.is(Flag.checkNotMaster)) {
             stream = (stream.filter(other -> master.getId() != other.getId()));
         }
 
         if (chainChecking) {  //Для вызовов, которые проверяют цепочки
-            stream = stream.filter(other -> Type.chainCheck(other, shapeRenderer,
+            stream = stream.filter(other -> type.chainCheck(other, shapeRenderer,
                     new Circle(cursor, radius)));
         } else { //Проверяем коллизию для всех остальных
             stream = stream.filter(other -> type.check(other, master.getCenter(), cursor,
                     new Circle(cursor, radius)));
         }
 
-        if (flags.is(Flag.stopOnFirstCollision)) { //Если есть stop onFirstCollision, то добавляется только первая найденная цель
-            flags.del(Flag.stopOnFirstCollision);
+        if (type.flags.is(Flag.stopOnFirstCollision)) { //Если есть stop onFirstCollision, то добавляется только первая найденная цель
+            stream = stream.sorted(Comparator.comparing(health -> health.getCenter().dst(master.getCenter())));
+            type.flags.del(Flag.stopOnFirstCollision);
             chainChecking=true;
             stream.findFirst().ifPresent(other -> { //Если есть chainDamage, то вызывается act, но с удаленным stopOnFirst и отметкой chainChecking, что идет проверка цепи
-                if (type.isAdd(other) && flags.is(Flag.chainDamage)) act(type, mainPool, shapeRenderer, master, other.getCenter(), radius);
+                if (type.isAdd(other) && type.flags.is(Flag.chainDamage)) act(type, mainPool, shapeRenderer, master, other.getCenter(), radius);
             }); //Цепочка тоже начинается только от первой цели
             chainChecking=false;
-            flags.add(Flag.stopOnFirstCollision);
+            type.flags.add(Flag.stopOnFirstCollision);
         } else {
             stream.forEach(other -> { //Цепочка начинается от каждой цели
-                if (type.isAdd(other) && flags.is(Flag.chainDamage)) {
+                if (type.isAdd(other) && type.flags.is(Flag.chainDamage)) {
                     act(type,mainPool, shapeRenderer, master, other.getCenter(), radius);
                 };
             });
@@ -105,8 +102,5 @@ public class Attack {
     }
     public void setMaster(Attackable master) {
         this.master = master;
-    }
-    public void setFlags(Flag flags) {
-        this.flags = flags;
     }
 }

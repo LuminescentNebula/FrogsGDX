@@ -8,12 +8,18 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mygdx.game.interfaces.Collidable;
+import com.mygdx.game.interfaces.Health;
 
-public class Enemy extends Group implements Collidable {
+public class Enemy extends Group implements Health {
 
     Rectangle bounds = new Rectangle();
     Image image;
     private int ID;
+
+    private int health;
+    private int maxHealth=100;
+    private boolean targeted=false;
+
     public Enemy(int ID){
         image = new Image(new Texture(Gdx.files.internal("ghost.png")));
         addActor(image);
@@ -58,5 +64,36 @@ public class Enemy extends Group implements Collidable {
     @Override
     public int getId() {
         return ID;
+    }
+
+    @Override
+    public void setHealth(int health) {
+        this.health=health;
+    }
+
+    @Override
+    public int getHealth() {
+        return health;
+    }
+
+    @Override
+    public void dealHealth(int health) {
+        this.health-=health;
+    }
+
+    @Override
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    @Override
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth=maxHealth;
+    }
+
+    @Override
+    public boolean setTargeted(boolean targeted) {
+        this.targeted=targeted;
+        return targeted;
     }
 }

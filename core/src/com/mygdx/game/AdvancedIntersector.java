@@ -45,7 +45,7 @@ public class AdvancedIntersector  {
         float rectangleEndY = rectangle.y + rectangle.height;
         calculateAlignment(startX, startY, endX, endY, rectangle, alignment);
 
-        System.out.println(alignment.list()[0].get()+" "+alignment.list()[1].get());
+        //System.out.println(alignment.list()[0].get()+" "+alignment.list()[1].get());
         for (Alignment i: alignment.list()) {
             switch (i) {
                 case LEFT:
@@ -83,7 +83,10 @@ public class AdvancedIntersector  {
         return intersectSegmentRectangle(start.x, start.y, end.x, end.y, rectangle,intersection,alignment);
     }
 
-    public static boolean intersectSegmentRectangle (float startX, float startY, float endX, float endY, Rectangle rectangle,Vector2 intersection) {
+    public static boolean intersectSegmentRectangle (Vector2 start, Vector2 end, Rectangle rectangle, Vector2 intersection) {
+        return intersectSegmentRectangle(start.x, start.y, end.x, end.y, rectangle,intersection);
+    }
+        public static boolean intersectSegmentRectangle (float startX, float startY, float endX, float endY, Rectangle rectangle,Vector2 intersection) {
         float rectangleEndX = rectangle.x + rectangle.width;
         float rectangleEndY = rectangle.y + rectangle.height;
 

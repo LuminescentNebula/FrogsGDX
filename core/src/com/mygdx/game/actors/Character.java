@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -17,9 +16,10 @@ import com.mygdx.game.MainPool;
 import com.mygdx.game.Move;
 import com.mygdx.game.Projection;
 import com.mygdx.game.actions.Attack;
-import com.mygdx.game.actions.Fabric;
+import com.mygdx.game.actions.TypeFabric;
 import com.mygdx.game.actions.Flag;
 import com.mygdx.game.actions.Radius;
+import com.mygdx.game.actions.mods.*;
 import com.mygdx.game.actions.types.*;
 import com.mygdx.game.interfaces.*;
 
@@ -105,22 +105,26 @@ public class Character extends Group implements Movable, Attackable, Health {
         health = 100;
 
 
-        Fabric fabric = new Fabric()
-                .setFlags((byte) (Flag.checkNotMaster));
+        TypeFabric typeFabric = new TypeFabric();
 
-//        fabric.addType(new Type() {
-//            @Override
-//            public boolean check(Health other, Vector2 master, Vector2 cursor, Circle circle) {
-//                return Acts.acts[0].check(other, master, cursor, circle);
-//            }
-//            @Override
-//            public void draw(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
-//                Draws.draws[0].draw(shapeRenderer, master, cursor, minLength, maxLength, radius);
-//            }
-//        }).setLength(0, 500).setRadius(Radius.LARGE).setDamage(10);
-        //fabric.addType(new Cone()).setLength(0, 100).setRadius(Radius.LARGE).setDamage(10);
+        for (int i=0;i<=5;i+=1) {
+            typeFabric.addType(new Type())
+                    .setDraw(Draws::drawShot)
+                    .addMod(new Rotate(45*i))
+                    .addMod(new Reset(true))
+                    .addMod(new StopOnCollision())
+                    .addMod(new StickToTargets())
 
-        attacks.add(fabric.build(this));
+                    .setAct(Acts::checkLine)
+                    .addFlag(Flag.checkNotMaster)
+                    .addFlag(Flag.stopOnFirstCollision)
+
+                    .setLength(0, 500)
+                    .setRadius(Radius.LARGE)
+                    .setDamage(10);
+        }
+
+        attacks.add(typeFabric.build(this));
 
         addListener(new InputListener() {
             @Override
