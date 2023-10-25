@@ -1,4 +1,4 @@
-package com.mygdx.game.actions.types;
+package com.mygdx.game.interfaces;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;

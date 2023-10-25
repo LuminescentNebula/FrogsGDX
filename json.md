@@ -40,12 +40,23 @@
 
 Что не работает друг с другом:
 
-|                          |   **Снаряд**    |   **Выстрел**   | **Сквозной<br>выстрел** |    **Цель**     |    **Конус**    |    **Радиус**    |
-|:------------------------:|:---------------:|:---------------:|:-----------------------:|:---------------:|:---------------:|:----------------:|
-|    **checkNotMaster**    |                 |                 |                         |                 |                 |                  |
-| **stopOnFirstCollision** |                 |                 |                         |                 |                 |                  |
-|     **chainDamage**      |                 |                 |                         |                 |                 |                  |
-| **chainDamageIncrease**  | Not implemented | Not implemented |     Not implemented     | Not implemented | Not implemented | Not implemented  |
-|        **radius**        |                 |        X        |            X            |                 |        X        |                  |
-|      **minLength**       |                 |                 |            X            |                 |                 |                  |
-|      **maxLength**       |                 |                 |            X            |                 |                 |                  |
+|                          |  **checkLine**  | **checkCircle** | **checkRange**  |
+|:------------------------:|:---------------:|:---------------:|:---------------:|
+|    **checkNotMaster**    |                 |                 |                 |
+| **stopOnFirstCollision** |                 |                 |                 |
+|     **chainDamage**      |                 |                 |                 |
+| **chainDamageIncrease**  | Not implemented | Not implemented | Not implemented |
+
+  
+
+|                      | **drawCatapult** | **drawShot** | **drawThroughShot** | **drawTarget**  |    **Конус**    | **drawCircle** | **drawLightning** |
+|:--------------------:|:----------------:|:------------:|:-------------------:|:---------------:|:---------------:|:--------------:|-------------------|
+|      **radius**      |                  |      X       |          X          | Not implemented |        X        |                | Not implemented   |
+|    **minLength**     |                  |              |          X          | Not implemented |                 |                | Not implemented   |
+|    **maxLength**     |                  |              |          X          | Not implemented |                 |                | Not implemented   |
+|      **Mirror**      |                  |              |                     | Not implemented | Not implemented |       ?        | Not implemented   |
+|      **rotate**      |                  |              |                     | Not implemented | Not implemented |       ?        | Not implemented   |
+|  **StickToTargets**  |        ?         |              |          ?          | Not implemented | Not implemented |       ?        | Not implemented   |
+| **StopOnCollision**  |        ?         |              |          ?          | Not implemented | Not implemented |       ?        | Not implemented   |
+|    **Translate**     |                  |              |                     | Not implemented | Not implemented |       ?        | Not implemented   |
+| **TranslateRotated** |                  |              |                     | Not implemented | Not implemented |       ?        | Not implemented   |

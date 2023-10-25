@@ -3,6 +3,7 @@ package com.mygdx.game.actions.types;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.interfaces.DrawInterface;
 
 public abstract class Draws {
 
@@ -13,7 +14,7 @@ public abstract class Draws {
             Draws::drawCircle,
     };
 
-    private static void drawCatapult(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+    public static void drawCatapult(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(1,1,1, 1);
         clamp(master,cursor,minLength,maxLength);
@@ -26,18 +27,18 @@ public abstract class Draws {
                 10,shapeRenderer);
         drawCircle(shapeRenderer, master, cursor, minLength, maxLength, radius);
     }
-    private static void drawShot(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+    public static void drawShot(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         clamp(master, cursor, minLength, maxLength);
         Vector2 vec2 = new Vector2(cursor).sub(new Vector2(master));
         for (int i = 0; i <= 10; i += 1) {
             shapeRenderer.circle(master.x + vec2.x * i / 10, master.y + vec2.y * i / 10, 5);
         }
     }
-    private static void drawLightning(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+    public static void drawLightning(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         //TODO
         //Молния, которая бьёт по прямой и искажается каждый кадр или несколько
     }
-    private static void drawThroughShot(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+    public static void drawThroughShot(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         clamp(master,cursor,minLength,maxLength);
         Vector2 vec2 = new Vector2(cursor).sub(new Vector2(master));
         //TODO:Костыль
@@ -46,12 +47,12 @@ public abstract class Draws {
             shapeRenderer.circle(master.x + vec2.x*i/20, master.y + vec2.y*i/20, 5);
         }
     }
-    private static void drawCircle(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+    public static void drawCircle(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Line);
         shapeRenderer.circle(cursor.x, cursor.y, radius);
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
     }
-    private static void drawTarget(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
+    public static void drawTarget(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         shapeRenderer.x(cursor,25);
         //TODO |
         //   -- --

@@ -20,11 +20,11 @@ public class AlignmentPack {
     public Alignment alignmentSides;
     public Alignment alignmentLevel;
 
-    AlignmentPack(Alignment alignmentSides, Alignment alignmentLevel) {
+    public AlignmentPack(Alignment alignmentSides, Alignment alignmentLevel) {
         this.alignmentSides = alignmentSides;
         this.alignmentLevel = alignmentLevel;
     }
-    AlignmentPack() {
+    public AlignmentPack() {
         this.alignmentSides = Alignment.EMPTY;
         this.alignmentLevel = Alignment.EMPTY;
     }

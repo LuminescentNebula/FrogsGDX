@@ -5,16 +5,15 @@ import com.mygdx.game.interfaces.Attackable;
 
 import java.util.ArrayList;
 
-public class Fabric {
+public class TypeFabric {
 
-    private Flag flags=new Flag();
     private ArrayList<Type> types=  new ArrayList<>();
 
-    public Fabric(){
+    public TypeFabric(){
 
     }
 
-    public Fabric setTypes(ArrayList<Type> types) {
+    public TypeFabric setTypes(ArrayList<Type> types) {
         this.types=types;
         return this;
     }
@@ -28,17 +27,8 @@ public class Fabric {
         Attack attack = new Attack();
         attack.setMaster(master);
         attack.setTypes(types);
-        attack.setFlags(flags);
         return attack;
     }
 
-    public Fabric setFlags(byte flags){
-        this.flags=new Flag(flags);
-        return this;
-    }
-    public Fabric addFlag(byte flag){
-        this.flags.add(flag);
-        return this;
-    }
 
 }
