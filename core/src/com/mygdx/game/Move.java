@@ -3,7 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.math.Vector2;
 
 public class Move{
-    Vector2 vector;
+    public Vector2 vector;
     final float action;
     public Move(Vector2 vector,float action){
         this.vector=new Vector2(vector);

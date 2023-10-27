@@ -2,29 +2,30 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.interfaces.Collidable;
-import com.mygdx.game.interfaces.Movable;
+import com.mygdx.game.interfaces.Projectable;
 
 public class Projection {
     public static final float MAX_LINE_LENGTH = 250f;
     private static final float LINE_THICKNESS = 15f;
-    private static final int MIN_DISTANCE = 20;
-    private static final int MIN_TIME_DIFFERENCE = 100;
+    public static final int MIN_DISTANCE = 20;
+    public static final int MIN_TIME_DIFFERENCE = 100;
 
 
-    private static boolean calculateIntersection(Movable movable, MainPool mainPool, Vector2 cursor){
+    private static boolean calculateIntersection(Projectable projectable, MainPool mainPool, Vector2 cursor){
         Vector2 intersection = new Vector2();
         AlignmentPack alignmentPack = new AlignmentPack();
 
         for (Collidable other : mainPool.getCollidables()) {
-            if (other.getId()!=movable.getId()) {
+            if (other.getId()!= projectable.getId()) {
 
                 if (AdvancedIntersector.intersectSegmentRectangle(
-                        movable.getPathPoints().getLast().vector,
+                        projectable.getPathPoints().getLast().vector,
                         cursor,
                         other.getBounds(), intersection,alignmentPack)) {
                     intersection.x+=alignmentPack.alignmentSides.get();
@@ -37,105 +38,103 @@ public class Projection {
         return false;
     }
 
-    public static void draw(Stage stage, Movable movable, ShapeRenderer shapeRenderer, MainPool mainPool){
-        for (int i = 0; i< movable.getPathPoints().size()-1; i++){
+    public static void draw(Vector2 cursor, Batch batch, Projectable projectable, ShapeRenderer shapeRenderer, MainPool mainPool){
+        for (int i = 0; i< projectable.getPathPoints().size()-1; i++){
             shapeRenderer.rectLine(
-                    movable.getPathPoints().get(i).vector,
-                    movable.getPathPoints().get(i+1).vector,
+                    projectable.getPathPoints().get(i).vector,
+                    projectable.getPathPoints().get(i+1).vector,
                     LINE_THICKNESS);
             shapeRenderer.circle(
-                    movable.getPathPoints().get(i+1).vector.x,
-                    movable.getPathPoints().get(i+1).vector.y,
+                    projectable.getPathPoints().get(i+1).vector.x,
+                    projectable.getPathPoints().get(i+1).vector.y,
                     LINE_THICKNESS);
         }
 
-        Vector2 cursor=stage.getViewport().unproject(new Vector2(Gdx.input.getX(),Gdx.input.getY()));
-
-        Vector2 direction = cursor.cpy().sub(movable.getPathPoints().getLast().vector);
-        float restriction=Math.min(MAX_LINE_LENGTH, movable.getMaxAction()- movable.getAction()- movable.getCurrentAction());
+        Vector2 direction = cursor.cpy().sub(projectable.getPathPoints().getLast().vector);
+        float restriction=Math.min(MAX_LINE_LENGTH, projectable.getMaxAction()- projectable.getAction()- projectable.getCurrentAction());
         if (direction.len() > restriction) {
             direction.setLength(restriction);
-            cursor.set(movable.getPathPoints().getLast().vector.cpy().add(direction));
+            cursor.set(projectable.getPathPoints().getLast().vector.cpy().add(direction));
         }
 
-        calculateIntersection(movable,mainPool, cursor);
+        calculateIntersection(projectable,mainPool, cursor);
 
-        shapeRenderer.rectLine(movable.getPathPoints().getLast().vector,cursor, LINE_THICKNESS);
-        transparentProjection(movable,cursor,stage);
+        shapeRenderer.rectLine(projectable.getPathPoints().getLast().vector,cursor, LINE_THICKNESS);
+        transparentProjection(projectable,cursor,batch);
     }
 
-    private static void  transparentProjection(Movable movable, Vector2 cursor, Stage stage){
-        movable.getProjection().setPosition(
-                cursor.x - movable.getWidth()/2,
-                cursor.y - movable.getHeight()/2);
-        stage.getBatch().begin();
-        movable.getProjection().draw(stage.getBatch(),0.5f);
-        stage.getBatch().end();
+    private static void  transparentProjection(Projectable projectable, Vector2 cursor, Batch batch){
+        projectable.getProjection().setPosition(
+                cursor.x - projectable.getWidth()/2,
+                cursor.y - projectable.getHeight()/2);
+        batch.begin();
+        projectable.getProjection().draw(batch,0.5f);
+        batch.end();
     }
 
-    public static void calculateProjection(Stage stage, ShapeRenderer shapeRenderer, Movable movable, MainPool mainPool){
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-            if (cursor.y<=Gdx.graphics.getHeight()-75) { //TODO: Костыль для проверки, что нажатие в верхней части, где кнопки
-                //Проверка, что не слишком быстро и не слишком быстро после выделения
-                if (cursor.dst(movable.getPathPoints().getFirst().vector) > MIN_DISTANCE &&
-                        cursor.dst(movable.getPathPoints().getLast().vector) > MIN_DISTANCE &&
-                        Math.abs(movable.getTimestamp() - TimeUtils.millis()) > MIN_TIME_DIFFERENCE) {
-                    float action = checkDirection(new Vector2(movable.getProjection().getX() + movable.getWidth() / 2,
-                                    movable.getProjection().getY() + movable.getHeight() / 2),
-                            movable.getPathPoints().getLast().vector, movable);
-                    cursor.sub(movable.getWidth() / 2, movable.getHeight() / 2);
+    public static boolean applyProjection(Projectable projectable){
+        projectable.addAction(projectable.getCurrentAction());
+        //System.out.println(projectable.getAction());
+        projectable.setPosition(
+                projectable.getPathPoints().getLast().vector.x - projectable.getWidth() / 2,
+                projectable.getPathPoints().getLast().vector.y - projectable.getHeight() / 2);
+        //projectable.setSelected(false);
+        return false;
+    }
 
-                    if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-                        movable.getPathPoints().add(new Move(
-                                movable.getProjection().getX() + movable.getWidth() / 2,
-                                movable.getProjection().getY() + movable.getHeight() / 2,
-                                action));
-                        System.out.println(movable.getPathPoints());
-                        draw(stage, movable, shapeRenderer, mainPool);
-
-                    } else {
-                        movable.addAction(movable.getCurrentAction());
-                        System.out.println(movable.getAction());
-                        movable.setPosition(movable.getProjection().getX(), movable.getProjection().getY());
-                        movable.setSelected(false);
-                    }
-                } else {
-                    draw(stage, movable, shapeRenderer, mainPool);
-                }
-            }
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            movable.addAction(movable.getCurrentAction());
-            System.out.println(movable.getAction());
-            movable.setPosition(
-                    movable.getPathPoints().getLast().vector.x - movable.getWidth() / 2,
-                    movable.getPathPoints().getLast().vector.y - movable.getHeight() / 2);
-            movable.setSelected(false);
-        } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-            if (movable.getPathPoints().size()==1) {
-                movable.setSelected(false);
-            } else {
-                movable.addAction(-movable.getPathPoints().getLast().action);
-                movable.getPathPoints().removeLast();
-            }
+    public static boolean cancelProjection(Projectable projectable){
+        if (projectable.getPathPoints().size()==1) {
+            //projectable.setSelected(false);
+            return false;
         } else {
-            draw(stage, movable, shapeRenderer, mainPool);
+            projectable.addAction(-projectable.getPathPoints().getLast().action);
+            projectable.getPathPoints().removeLast();
         }
+        return true;
+    }
+
+    public static boolean calculateProjection(Vector2 cursor, Batch batch, ShapeRenderer shapeRenderer, Projectable projectable, MainPool mainPool, boolean shift) {
+        float action = calculateAction(cursor, projectable);
+
+        cursor.sub(projectable.getWidth() / 2, projectable.getHeight() / 2);
+
+        if (shift) {
+            projectable.getPathPoints().add(new Move(
+                    projectable.getProjection().getX() + projectable.getWidth() / 2,
+                    projectable.getProjection().getY() + projectable.getHeight() / 2,
+                    action));
+            //System.out.println(projectable.getPathPoints());
+            draw(cursor, batch, projectable, shapeRenderer, mainPool);
+
+        } else {
+            projectable.addAction(projectable.getCurrentAction());
+            //System.out.println(projectable.getAction());
+            projectable.setPosition(projectable.getProjection().getX(), projectable.getProjection().getY());
+            //projectable.setSelected(false);
+            return false;
+        }
+        return true;
+    }
+
+    private static float calculateAction(Vector2 cursor, Projectable projectable) {
+        return checkDirection(new Vector2(projectable.getProjection().getX() + projectable.getWidth() / 2,
+                        projectable.getProjection().getY() + projectable.getHeight() / 2),
+                projectable.getPathPoints().getLast().vector, projectable);
     }
 
     //point1 - cursor
     //point2 - center
-    private static float checkDirection(Vector2 cursor, Vector2 center, Movable character){
+    private static float checkDirection(Vector2 cursor, Vector2 center, Projectable projectable){
         Vector2 direction = cursor.cpy().sub(center);
         direction.limit(Projection.MAX_LINE_LENGTH);
         float n=0;
-        if (character.getAction() +character.getCurrentAction()+ direction.len() <= character.getMaxAction()) {
+        if (projectable.getAction() + projectable.getCurrentAction()+ direction.len() <= projectable.getMaxAction()) {
              n+= direction.len();
         } else {
-            direction.setLength(character.getMaxAction() - character.getAction() +-character.getCurrentAction());
-            n=character.getMaxAction() - character.getAction() +-character.getCurrentAction();
+            direction.setLength(projectable.getMaxAction() - projectable.getAction() +-projectable.getCurrentAction());
+            n= projectable.getMaxAction() - projectable.getAction() +-projectable.getCurrentAction();
         }
-        character.addAction(n);
+        projectable.addAction(n);
         cursor.set(center.cpy().add(direction));
         return n;
     }
