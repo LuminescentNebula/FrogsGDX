@@ -7,18 +7,18 @@ import com.mygdx.game.interfaces.Health;
 
 public class Cone extends Type {//Конус
     //FIXME: IMPLEMENT ME!!
-    float radius,angle;
-    protected final static float coneArcSize = 53;
+    //protected final static float coneArcSize = 53;
     
 
     @Override
     public boolean check(Health other, Vector2 master, Vector2 cursor, Circle circle) {
-        circle = new Circle(master,radius+1);
+        float angle = getAngle(master, cursor);
 
         Vector2 direction = cursor.cpy().sub(master);
-        direction.limit(350);
         cursor.set(master.cpy().add(direction));
-        double v2 = (radius*Math.tan(Math.toRadians(coneArcSize)/2));
+        double v2 = (cursor.dst(master)*Math.tan(Math.toRadians(circle.radius)/2));
+
+        circle = new Circle(master,cursor.dst(master)+1);
 
         Polygon tri = new Polygon(new float[]{
                 master.x, master.y,
@@ -38,24 +38,21 @@ public class Cone extends Type {//Конус
         return false;
     }
 
-    @Override
-    public void draw(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
-        Vector2 point1 = new Vector2(cursor);
-        Vector2 point2 = new Vector2(master.x + master.dst(cursor), master.y);
-        point1.sub(master).nor();
-        point2.sub(master).nor();
+    private static float getAngle(Vector2 master, Vector2 cursor) {
+        Vector2 point1 = new Vector2(cursor).sub(master).nor();
+        Vector2 point2 = new Vector2(master.x + master.dst(cursor), master.y).sub(master).nor();
         float angle = (MathUtils.atan2(point1.y, point1.x) - MathUtils.atan2(point2.y, point2.x));
+        return angle;
+    }
+
+    @Override
+    public void draw(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float coneArcSize) {
+        float angle = getAngle(master, cursor);
 
         Vector2 direction = cursor.cpy().sub(master);
-        if (minLength != 0 && maxLength != 0) {
-            direction.clamp(minLength, maxLength);
-        } else if (maxLength != 0) {
-            direction.limit(maxLength);
-        }
+        direction.clamp(minLength, maxLength);
+
         cursor.set(master.cpy().add(direction));
-        radius = cursor.dst(master);
-        this.radius = radius;
-        this.angle = angle;
 
         shapeRenderer.setColor(Attack.areaColor);
         shapeRenderer.arc(
