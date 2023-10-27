@@ -29,6 +29,10 @@ public class AlignmentPack {
         this.alignmentLevel = Alignment.EMPTY;
     }
 
+    public void set(AlignmentPack alignmentPack){
+        this.alignmentSides = alignmentPack.alignmentSides;
+        this.alignmentLevel = alignmentPack.alignmentLevel;
+    }
     public Alignment[] list(){
         return new Alignment[]{alignmentLevel,alignmentSides};
     }

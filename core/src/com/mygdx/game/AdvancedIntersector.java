@@ -10,42 +10,30 @@ public class AdvancedIntersector  {
     public AdvancedIntersector(){}
 
     //TODO javadoc
-    private static void calculateAlignment(float startX, float startY, float endX, float endY, Rectangle rectangle, AlignmentPack alignment) {
-        float rectangleEndX = rectangle.x + rectangle.width;
-        float rectangleEndY = rectangle.y + rectangle.height;
+    private static AlignmentPack calculateAlignment(float startX, float startY,
+                                           float rectangleX, float rectangleY,
+                                           float rectangleEndX, float rectangleEndY) {
+        AlignmentPack alignment = new AlignmentPack();
 
-        if (startY > rectangle.y && startY < rectangleEndY) {
-            if (startX > rectangleEndX) {
-                alignment.alignmentSides = AlignmentPack.Alignment.RIGHT;
-            } else {
-                alignment.alignmentSides = AlignmentPack.Alignment.LEFT;
-            }
-        } else if (startX > rectangle.x && startX < rectangleEndX) {
-            if (startY > rectangleEndY) {
-                alignment.alignmentLevel = AlignmentPack.Alignment.TOP;
-            } else {
-                alignment.alignmentLevel = AlignmentPack.Alignment.BOTTOM;
-            }
-        } else {
-            if (startX < rectangle.x) {
-                alignment.alignmentSides = AlignmentPack.Alignment.LEFT;
-            } else if (startX > rectangleEndX) {
-                alignment.alignmentSides = AlignmentPack.Alignment.RIGHT;
-            }
-            if (startY < rectangle.y) {
-                alignment.alignmentLevel = AlignmentPack.Alignment.BOTTOM;
-            } else if (startY > rectangleEndY) {
-                alignment.alignmentLevel = AlignmentPack.Alignment.TOP;
-            }
+        if (startX > rectangleEndX) {                     //32
+            alignment.alignmentSides = AlignmentPack.Alignment.RIGHT;
+        } else if (startX < rectangleX) {                              //31
+            alignment.alignmentSides = AlignmentPack.Alignment.LEFT;
         }
+        if (startY > rectangleEndY) {                     //42
+            alignment.alignmentLevel = AlignmentPack.Alignment.TOP;
+        } else if (startY < rectangleY) {                              //41
+            alignment.alignmentLevel = AlignmentPack.Alignment.BOTTOM;
+        }
+        return alignment;
     }
 
     public static boolean intersectSegmentRectangle (float startX, float startY, float endX, float endY, Rectangle rectangle, Vector2 intersection,AlignmentPack alignment) {
         float rectangleEndX = rectangle.x + rectangle.width;
         float rectangleEndY = rectangle.y + rectangle.height;
-        calculateAlignment(startX, startY, endX, endY, rectangle, alignment);
 
-        //System.out.println(alignment.list()[0].get()+" "+alignment.list()[1].get());
+        alignment.set(calculateAlignment(startX, startY, rectangle.x,rectangle.y, rectangleEndX, rectangleEndY));
+
         for (Alignment i: alignment.list()) {
             switch (i) {
                 case LEFT:
