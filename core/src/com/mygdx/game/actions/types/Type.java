@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.MainPool;
+import com.mygdx.game.pools.MainPool;
 import com.mygdx.game.actions.types.mods.Mod;
 import com.mygdx.game.actions.types.mods.Reset;
 import com.mygdx.game.interfaces.*;

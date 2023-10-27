@@ -3,7 +3,7 @@ package com.mygdx.game.actions.types.mods;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.AdvancedIntersector;
 import com.mygdx.game.AlignmentPack;
-import com.mygdx.game.MainPool;
+import com.mygdx.game.pools.MainPool;
 import com.mygdx.game.interfaces.Attackable;
 import com.mygdx.game.interfaces.Health;
 
@@ -30,6 +30,6 @@ public class StopOnCollision implements Mod{
 
     @Override
     public void apply(Attackable master, Vector2 cursor, MainPool mainPool) {
-        stopOnCollision(cursor,master,mainPool.getHealths());
+        stopOnCollision(cursor,master,mainPool.get(Health.class));
     }
 }

@@ -1,14 +1,11 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.interfaces.Collidable;
 import com.mygdx.game.interfaces.Projectable;
+import com.mygdx.game.pools.MainPool;
 
 public class Projection {
     public static final float MAX_LINE_LENGTH = 250f;
@@ -21,7 +18,7 @@ public class Projection {
         Vector2 intersection = new Vector2();
         AlignmentPack alignmentPack = new AlignmentPack();
 
-        for (Collidable other : mainPool.getCollidables()) {
+        for (Collidable other : mainPool.get(Collidable.class)) {
             if (other.getId()!= projectable.getId()) {
 
                 if (AdvancedIntersector.intersectSegmentRectangle(

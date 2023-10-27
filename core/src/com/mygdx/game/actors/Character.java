@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.mygdx.game.MainPool;
+import com.mygdx.game.pools.MainPool;
 import com.mygdx.game.Move;
 import com.mygdx.game.Projection;
 import com.mygdx.game.actions.Attack;

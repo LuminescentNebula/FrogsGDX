@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.MainPool;
+import com.mygdx.game.pools.MainPool;
 import com.mygdx.game.actions.types.*;
 import com.mygdx.game.interfaces.Attackable;
 import com.mygdx.game.interfaces.DrawInterface;
@@ -66,7 +66,7 @@ public class Attack {
     }
 
     public void act(Type type, MainPool mainPool, ShapeRenderer shapeRenderer, Attackable master, Vector2 cursor, float radius) {
-        Stream<Health> stream = mainPool.getHealths().stream();
+        Stream<Health> stream = mainPool.get(Health.class).stream();
         if (type.flags.is(Flag.checkNotMaster)) {
             stream = (stream.filter(other -> master.getId() != other.getId()));
         }

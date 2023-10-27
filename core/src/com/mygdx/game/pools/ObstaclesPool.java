@@ -1,5 +1,7 @@
 package com.mygdx.game.pools;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.game.actors.Obstacle;
 
 public class ObstaclesPool extends Pool<Obstacle> {
@@ -10,5 +12,10 @@ public class ObstaclesPool extends Pool<Obstacle> {
         obstacle.setSize(50,50);
         obstacle.setPosition(100,50);
         addActor(obstacle);
+    }
+
+    @Override
+    public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
+
     }
 }

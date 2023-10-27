@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.game.actions.Attack;
 import com.mygdx.game.actors.Character;
-import com.mygdx.game.MainPool;
 import com.mygdx.game.interfaces.CharacterSelectionListener;
 import com.mygdx.game.interfaces.CharacterUIListener;
 import com.mygdx.game.interfaces.UICharacterListener;
@@ -45,10 +44,10 @@ public class CharactersPool extends Pool<Character> implements CharacterSelectio
 //            character.move(stage,shapeRenderer, mainPool);
 //        }
 //    }
-
+    @Override
     public void act(Stage stage, ShapeRenderer shapeRenderer,MainPool mainPool) {
         for (Character character: actors) {
-            character.move(stage,shapeRenderer,mainPool);
+            character.act(stage,shapeRenderer,mainPool);
             //Todo: после окончания selection не снимается
         }
     }

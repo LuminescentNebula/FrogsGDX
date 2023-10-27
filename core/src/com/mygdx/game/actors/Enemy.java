@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.mygdx.game.pools.MainPool;
 import com.mygdx.game.Move;
 import com.mygdx.game.interfaces.Collidable;
 import com.mygdx.game.interfaces.Health;
