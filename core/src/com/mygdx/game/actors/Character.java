@@ -26,14 +26,14 @@ import com.mygdx.game.interfaces.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Character extends Group implements Movable, Attackable, Health {
+public class Character extends Group implements Projectable, Attackable, Health,Selectable {
 
     private Image character,selection,characterProjection;
     public long timeStamp;
 
-    protected final int maxAction=1000;   //Максимальное действие, которе можно совершить за раунд
+    protected final int maxAction=1000;     //Максимальное действие, которе можно совершить за раунд
     protected float action=0;               //Действие, которе было выполнено в текущем раунде
-    protected float currentAction;          //Действие, которое выполняется в текущем выделении персонажа
+    protected float currentAction;          //Действие, которое выполняется в текущем выделении персонажа
 
     ArrayList<Attack> attacks = new ArrayList<>();
     private int activeAttack=-1;
@@ -74,7 +74,6 @@ public class Character extends Group implements Movable, Attackable, Health {
         }
     }
 
-
     public Character(int ID) {
         Texture texture = new Texture(Gdx.files.internal("character.png"));
         this.ID = ID;
@@ -89,7 +88,6 @@ public class Character extends Group implements Movable, Attackable, Health {
         selection.setSize(50, 100);
         selection.setVisible(false);
         selection.setName("Selection");
-
 
         //Проекция при движении
         characterProjection = new Image(texture);
@@ -107,20 +105,24 @@ public class Character extends Group implements Movable, Attackable, Health {
 
         TypeFabric typeFabric = new TypeFabric();
 
-        for (int i=0;i<=5;i+=1) {
+        for (int i=0;i<1;i+=1) {
             typeFabric.addType(new Type())
-                    .setDraw(Draws::drawShot)
+                    .setDraw(Draws::drawCircle)
                     .addMod(new Rotate(45*i))
-                    .addMod(new Reset(true))
-                    .addMod(new StopOnCollision())
+                    //.addMod(new Mirror(Mirror.MIRROR_X))
+                    //.addMod(new StopOnCollision())
                     .addMod(new StickToTargets())
+                    //.addMod(new Translate(10,10))
+                    //.addMod(new TranslateRotated(10,10))
+                    .addMod(new Reset(true))
 
-                    .setAct(Acts::checkLine)
+                    .setAct(Acts::checkCircle)
                     .addFlag(Flag.checkNotMaster)
-                    .addFlag(Flag.stopOnFirstCollision)
+                    //.addFlag(Flag.stopOnFirstCollision)
+                    //.addFlag(Flag.chainDamage)
 
                     .setLength(0, 500)
-                    .setRadius(Radius.LARGE)
+                    .setRadius(Radius.MEDIUM)
                     .setDamage(10);
         }
 
@@ -141,12 +143,34 @@ public class Character extends Group implements Movable, Attackable, Health {
             if (attacking) {
                 act(stage,shapeRenderer,mainPool);
             } else {
-                Projection.calculateProjection(stage, shapeRenderer, this, mainPool);
+                Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+                boolean result=true;
+                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                    if ((cursor.y <= Gdx.graphics.getHeight() - 75) && isCursorValid(cursor)) { //TODO: Костыль для проверки, что нажатие в верхней части, где кнопки
+                        result=Projection.calculateProjection(cursor, stage.getBatch(), shapeRenderer, this, mainPool,
+                                Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT));
+                    }
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
+                    result=Projection.applyProjection(this);
+                } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)){
+                    result=Projection.cancelProjection(this);
+                } else {
+                    Projection.draw(cursor,stage.getBatch(), this, shapeRenderer, mainPool);
+                }
+                if (!result){
+                    setSelected(false);
+                }
             }
         }
 //        if (getDebug()){ //Отрисовка диагонали коллизии
 //            shapeRenderer.rectLine(getX(),getY(),getX()+getWidth(),getY()+getHeight(),10);
 //        }
+    }
+
+    private boolean isCursorValid(Vector2 cursor) {
+        return cursor.dst(getPathPoints().getFirst().vector) > Projection.MIN_DISTANCE &&
+                cursor.dst(getPathPoints().getLast().vector) > Projection.MIN_DISTANCE &&
+                Math.abs(getTimestamp() - TimeUtils.millis()) > Projection.MIN_TIME_DIFFERENCE;
     }
 
     public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
@@ -279,15 +303,15 @@ public class Character extends Group implements Movable, Attackable, Health {
         return pathPoints;
     }
 
-    @Override
-    public Image getImage() {
-        return character;
-    }
+//    @Override
+//    public Image getImage() {
+//        return character;
+//    }
 
-    @Override
-    public Image getSelection() {
-        return selection;
-    }
+//    @Override
+//    public Image getSelection() {
+//        return selection;
+//    }
 
     @Override
     public Image getProjection() {

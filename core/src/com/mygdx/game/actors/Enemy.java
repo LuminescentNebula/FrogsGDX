@@ -7,10 +7,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.mygdx.game.Move;
 import com.mygdx.game.interfaces.Collidable;
 import com.mygdx.game.interfaces.Health;
+import com.mygdx.game.interfaces.Movable;
 
-public class Enemy extends Group implements Health {
+import java.util.LinkedList;
+
+public class Enemy extends Group implements Movable,Health {
 
     Rectangle bounds = new Rectangle();
     Image image;
@@ -19,6 +23,11 @@ public class Enemy extends Group implements Health {
     private int health;
     private int maxHealth=100;
     private boolean targeted=false;
+
+    protected final int maxAction=1000;
+    protected float action=0;
+    protected float currentAction;
+    private LinkedList<Move> pathPoints;
 
     public Enemy(int ID){
         image = new Image(new Texture(Gdx.files.internal("ghost.png")));
@@ -46,6 +55,7 @@ public class Enemy extends Group implements Health {
     public float getCenterX(){
         return getX()+getWidth()/2;
     }
+
     @Override
     public float getCenterY(){
         return getY()+getHeight()/2;
@@ -95,5 +105,35 @@ public class Enemy extends Group implements Health {
     public boolean setTargeted(boolean targeted) {
         this.targeted=targeted;
         return targeted;
+    }
+
+    @Override
+    public float getMaxAction() {
+        return maxAction;
+    }
+
+    @Override
+    public float getAction() {
+        return action;
+    }
+
+    @Override
+    public void setAction(float action) {
+        this.action=action;
+    }
+
+    @Override
+    public void addAction(float action) {
+        this.action+=action;
+    }
+
+    @Override
+    public float getCurrentAction() {
+        return currentAction;
+    }
+
+    @Override
+    public LinkedList<Move> getPathPoints() {
+        return pathPoints;
     }
 }

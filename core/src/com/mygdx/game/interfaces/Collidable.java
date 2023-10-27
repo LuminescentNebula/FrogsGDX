@@ -17,9 +17,6 @@ public interface Collidable {
     float getCenterY();
     Vector2 getCenter();
     void setPosition(float x, float y);
-
-
-
     int getId();
     //FIXME:for debug
     String getName();
