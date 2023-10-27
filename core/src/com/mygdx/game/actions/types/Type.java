@@ -5,11 +5,8 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.MainPool;
-import com.mygdx.game.actions.Flag;
-import com.mygdx.game.actions.Length;
-import com.mygdx.game.actions.Radius;
-import com.mygdx.game.actions.mods.Mod;
-import com.mygdx.game.actions.mods.Reset;
+import com.mygdx.game.actions.types.mods.Mod;
+import com.mygdx.game.actions.types.mods.Reset;
 import com.mygdx.game.interfaces.*;
 
 import java.util.*;

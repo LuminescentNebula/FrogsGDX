@@ -1,4 +1,4 @@
-package com.mygdx.game.actions;
+package com.mygdx.game.actions.types;
 
 
 public class Flag {

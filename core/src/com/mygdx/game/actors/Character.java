@@ -17,10 +17,13 @@ import com.mygdx.game.Move;
 import com.mygdx.game.Projection;
 import com.mygdx.game.actions.Attack;
 import com.mygdx.game.actions.TypeFabric;
-import com.mygdx.game.actions.Flag;
-import com.mygdx.game.actions.Radius;
-import com.mygdx.game.actions.mods.*;
+import com.mygdx.game.actions.types.Flag;
+import com.mygdx.game.actions.types.Radius;
+import com.mygdx.game.actions.types.mods.*;
 import com.mygdx.game.actions.types.*;
+import com.mygdx.game.actions.types.mods.Reset;
+import com.mygdx.game.actions.types.mods.Rotate;
+import com.mygdx.game.actions.types.mods.StickToTargets;
 import com.mygdx.game.interfaces.*;
 
 import java.util.ArrayList;

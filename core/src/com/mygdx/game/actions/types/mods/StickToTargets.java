@@ -1,12 +1,10 @@
-package com.mygdx.game.actions.mods;
+package com.mygdx.game.actions.types.mods;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.AdvancedIntersector;
 import com.mygdx.game.MainPool;
 import com.mygdx.game.interfaces.Attackable;
 import com.mygdx.game.interfaces.Health;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class StickToTargets implements Mod {
