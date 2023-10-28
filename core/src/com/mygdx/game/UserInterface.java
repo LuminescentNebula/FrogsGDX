@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.kotcrab.vis.ui.VisUI;
 import com.mygdx.game.actions.Attack;
 import com.mygdx.game.interfaces.CharacterUIListener;
@@ -20,7 +21,7 @@ public class UserInterface extends Group implements UIListener, CharacterUIListe
     UICharacterListener uiCharacterListener;
 
     UserInterface() {}
-
+//TODO: Expang ui to 174 / 150 from top and add collision
     public void build(){
         VisUI.load();
         Skin skin = VisUI.getSkin();
@@ -31,8 +32,7 @@ public class UserInterface extends Group implements UIListener, CharacterUIListe
 
         //buttonTable.align(Align.top);
         setTouchable(Touchable.childrenOnly);
-        setHeight(75);
-        setY(Gdx.graphics.getHeight() - 75);
+        setHeight(150);
         buttonTable.setFillParent(true);
 
         int N = 3;
@@ -67,7 +67,7 @@ public class UserInterface extends Group implements UIListener, CharacterUIListe
         for (int i=0;i< attacks.size();i++) {
             Button button = new TextButton(attacks.get(i).toString(), VisUI.getSkin());
             int id=i;
-            buttonTable.add(button).expand();
+            buttonTable.add(button).expand().align(Align.left);
             button.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
