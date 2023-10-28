@@ -23,15 +23,15 @@
                 "x": 50,
                 "y": 0
               }
-            ]
+            ],
+            "flags": {
+              "checkNotMaster": false,
+              "stopOnFirstCollision": false,
+              "chainDamege": false,
+              "chainDamageIncrease": false
+            }
           }
-        ],
-        "flags": {
-          "checkNotMaster": false,
-          "stopOnFirstCollision": false,
-          "chainDamege": false,
-          "chainDamageIncrease": false
-        }
+        ]
       }
     ]
 }
@@ -40,23 +40,23 @@
 
 Что не работает друг с другом:
 
-|                          |  **checkLine**  | **checkCircle** | **checkRange**  |
-|:------------------------:|:---------------:|:---------------:|:---------------:|
-|    **checkNotMaster**    |                 |                 |                 |
-| **stopOnFirstCollision** |                 |                 |                 |
-|     **chainDamage**      |                 |                 |                 |
-| **chainDamageIncrease**  | Not implemented | Not implemented | Not implemented |
+|                          |  **checkLine**  | **checkCircle** | **checkRange**  | **checkCone**   |
+|:------------------------:|:---------------:|:---------------:|:---------------:|-----------------|
+|    **checkNotMaster**    |                 |                 |                 | ?               |
+| **stopOnFirstCollision** |                 |                 |                 | ?               |
+|     **chainDamage**      |                 |                 |                 | ?               |
+| **chainDamageIncrease**  | Not implemented | Not implemented | Not implemented | Not implemented |
 
   
 
-|                      | **drawCatapult** | **drawShot** | **drawThroughShot** | **drawTarget**  |    **Конус**    | **drawCircle** | **drawLightning** |
-|:--------------------:|:----------------:|:------------:|:-------------------:|:---------------:|:---------------:|:--------------:|-------------------|
-|      **radius**      |                  |      X       |          X          | Not implemented |        X        |                | Not implemented   |
-|    **minLength**     |                  |              |          X          | Not implemented |                 |                | Not implemented   |
-|    **maxLength**     |                  |              |          X          | Not implemented |                 |                | Not implemented   |
-|      **Mirror**      |                  |              |                     | Not implemented | Not implemented |       ?        | Not implemented   |
-|      **rotate**      |                  |              |                     | Not implemented | Not implemented |       ?        | Not implemented   |
-|  **StickToTargets**  |        ?         |              |          ?          | Not implemented | Not implemented |       ?        | Not implemented   |
-| **StopOnCollision**  |        ?         |              |          ?          | Not implemented | Not implemented |       ?        | Not implemented   |
-|    **Translate**     |                  |              |                     | Not implemented | Not implemented |       ?        | Not implemented   |
-| **TranslateRotated** |                  |              |                     | Not implemented | Not implemented |       ?        | Not implemented   |
+|                      | **drawCatapult** | **drawShot** | **drawThroughShot** | **drawTarget**  |    **Конус**    | **drawCircle** | **drawLightning** | **drawCone**  |
+|:--------------------:|:----------------:|:------------:|:-------------------:|:---------------:|:---------------:|:--------------:|-------------------|---------------|
+|      **radius**      |                  |      X       |          X          | Not implemented |        X        |                | Not implemented   | (Угол конуса) |
+|    **minLength**     |                  |              |          X          | Not implemented |                 |                | Not implemented   | X             |
+|    **maxLength**     |                  |              |          X          | Not implemented |                 |                | Not implemented   | X             |
+|      **Mirror**      |                  |              |                     | Not implemented | Not implemented |                | Not implemented   |               |
+|      **Rotate**      |                  |              |                     | Not implemented | Not implemented |                | Not implemented   |               |
+|  **StickToTargets**  |                  |              |                     | Not implemented | Not implemented |                | Not implemented   | ?             |
+| **StopOnCollision**  |                  |              |          X          | Not implemented | Not implemented |                | Not implemented   | ?             |
+|    **Translate**     |                  |              |                     | Not implemented | Not implemented |                | Not implemented   |               |
+| **TranslateRotated** |                  |              |                     | Not implemented | Not implemented |                | Not implemented   |               |
