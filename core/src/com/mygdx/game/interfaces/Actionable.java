@@ -1,14 +1,13 @@
 package com.mygdx.game.interfaces;
 
-import com.mygdx.game.Move;
-
-import java.util.LinkedList;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.game.pools.MainPool;
 
-public interface Actionable extends Collidable {
+public interface Actionable {
     float getMaxAction();
+    float getAvailableAction();
     float getAction();
-    void setAction(float action);
     void addAction(float action);
-    float getCurrentAction();
+    void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool);
 }

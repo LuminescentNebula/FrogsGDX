@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class TypeFabric {
 
     private ArrayList<Type> types=  new ArrayList<>();
-
+    private float actionCost=0;
     public TypeFabric(){
 
     }
@@ -23,12 +23,24 @@ public class TypeFabric {
         return type;
     }
 
+    public TypeFabric setActionCost(float cost){
+        this.actionCost=cost;
+        return this;
+    }
+
+    public TypeFabric addActionCost(float cost){
+        this.actionCost+=cost;
+        return this;
+    }
     public Attack  build(Attackable master){
         Attack attack = new Attack();
         attack.setMaster(master);
         attack.setTypes(types);
+        attack.setActionCost(actionCost);
         return attack;
     }
+
+
 
 
 }

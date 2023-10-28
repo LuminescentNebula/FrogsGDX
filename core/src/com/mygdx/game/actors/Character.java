@@ -3,6 +3,7 @@ package com.mygdx.game.actors;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -12,31 +13,29 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.actions.types.mods.StopOnCollision;
+import com.mygdx.game.interfaces.*;
 import com.mygdx.game.pools.MainPool;
-import com.mygdx.game.Move;
+import com.mygdx.game.MoveAction;
 import com.mygdx.game.Projection;
 import com.mygdx.game.actions.Attack;
 import com.mygdx.game.actions.TypeFabric;
 import com.mygdx.game.actions.types.Flag;
 import com.mygdx.game.actions.types.Radius;
-import com.mygdx.game.actions.types.mods.*;
 import com.mygdx.game.actions.types.*;
 import com.mygdx.game.actions.types.mods.Reset;
 import com.mygdx.game.actions.types.mods.Rotate;
-import com.mygdx.game.actions.types.mods.StickToTargets;
-import com.mygdx.game.interfaces.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Character extends Group implements Projectable, Attackable, Health,Selectable {
+public class Character extends Group implements Projectable, Attackable, Collidable, Health, Selectable {
 
     private Image character,selection,characterProjection;
     public long timeStamp;
 
     protected final int maxAction=1000;     //Максимальное действие, которе можно совершить за раунд
     protected float action=0;               //Действие, которе было выполнено в текущем раунде
-    protected float currentAction;          //Действие, которое выполняется в текущем выделении персонажа
 
     ArrayList<Attack> attacks = new ArrayList<>();
     private int activeAttack=-1;
@@ -47,8 +46,10 @@ public class Character extends Group implements Projectable, Attackable, Health,
     private boolean selected=false;
     private boolean attacking=false;
 
-    private LinkedList<Move> pathPoints;
-    private CharacterSelectionListener selectionListener;
+    private boolean isCollidable=true;
+
+    private LinkedList<MoveAction> pathPoints;
+    private CharacterPoolListener poolListener;
 
     private Rectangle bounds = new Rectangle();
     private final int ID;
@@ -66,7 +67,7 @@ public class Character extends Group implements Projectable, Attackable, Health,
     }
     public void setAttacking(boolean attacking,int index) {
         this.attacking = attacking;
-        System.out.println(attacking);
+        System.out.println("Attacking "+attacking);
         attacks.forEach((attack -> {
             attack.setSelected(false);
             attack.flushTargets();
@@ -106,15 +107,16 @@ public class Character extends Group implements Projectable, Attackable, Health,
         health = 100;
 
 
-        TypeFabric typeFabric = new TypeFabric();
+        TypeFabric typeFabric = new TypeFabric()
+                .setActionCost(150);
 
         for (int i=0;i<1;i+=1) {
             typeFabric.addType(new Type())
-                    .setDraw(Draws::drawCircle)
+                    .setDraw(Draws::drawShot)
                     .addMod(new Rotate(45*i))
                     //.addMod(new Mirror(Mirror.MIRROR_X))
-                    //.addMod(new StopOnCollision())
-                    .addMod(new StickToTargets())
+                    .addMod(new StopOnCollision())
+                    //.addMod(new StickToTargets())
                     //.addMod(new Translate(10,10))
                     //.addMod(new TranslateRotated(10,10))
                     .addMod(new Reset(true))
@@ -140,34 +142,53 @@ public class Character extends Group implements Projectable, Attackable, Health,
         });
     }
 
-    public void move(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool){
+    @Override
+    public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool){
         if (isSelected()) {
+            Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
             //System.out.println(attacking);
             if (attacking) {
-                act(stage,shapeRenderer,mainPool);
+                attack(cursor,stage.getBatch(),shapeRenderer,mainPool);
             } else {
-                Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-                boolean result=true;
-                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                    if ((cursor.y <= Gdx.graphics.getHeight() - 75) && isCursorValid(cursor)) { //TODO: Костыль для проверки, что нажатие в верхней части, где кнопки
-                        result=Projection.calculateProjection(cursor, stage.getBatch(), shapeRenderer, this, mainPool,
-                                Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT));
-                    }
-                } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
-                    result=Projection.applyProjection(this);
-                } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)){
-                    result=Projection.cancelProjection(this);
-                } else {
-                    Projection.draw(cursor,stage.getBatch(), this, shapeRenderer, mainPool);
-                }
-                if (!result){
-                    setSelected(false);
-                }
+                move(cursor,stage.getBatch(),shapeRenderer,mainPool);
             }
         }
-//        if (getDebug()){ //Отрисовка диагонали коллизии
-//            shapeRenderer.rectLine(getX(),getY(),getX()+getWidth(),getY()+getHeight(),10);
-//        }
+    }
+
+    public void move(Vector2 cursor, Batch batch, ShapeRenderer shapeRenderer, MainPool mainPool){
+        boolean result=true;
+        System.out.println(action + " " +pathPoints);
+
+        Projection.draw(cursor,batch, this, shapeRenderer, mainPool);
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            if ((cursor.y <= Gdx.graphics.getHeight() - 174) && isCursorValid(cursor)) { //TODO: Костыль для проверки, что нажатие в верхней части, где кнопки
+                result=Projection.calculateProjection(cursor, batch, shapeRenderer, this, mainPool,
+                        Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT));
+            }
+        } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
+            result=Projection.applyProjection(this);
+        } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)){
+            result=Projection.cancelProjection(this);
+        }
+        if (!result){
+            System.out.println(getAction());
+            setSelected(false);
+        }
+    }
+
+    public void attack(Vector2 cursor, Batch batch, ShapeRenderer shapeRenderer, MainPool mainPool) {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+            setSelected(!selected);
+            stopAttacking();
+        } else {
+            attacks.get(activeAttack).check(shapeRenderer, this, cursor, mainPool);
+            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+                //attacks.get(activeAttack).deal();
+                addAction(attacks.get(activeAttack).getActionCost());
+                setSelected(!selected);
+                stopAttacking();
+            }
+        }
     }
 
     private boolean isCursorValid(Vector2 cursor) {
@@ -176,20 +197,7 @@ public class Character extends Group implements Projectable, Attackable, Health,
                 Math.abs(getTimestamp() - TimeUtils.millis()) > Projection.MIN_TIME_DIFFERENCE;
     }
 
-    public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-            setSelected(!selected);
-            stopAttacking();
-        } else {
-            Vector2 cursor = stage.getViewport().unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
-            if (selected) {
-                attacks.get(activeAttack).check(shapeRenderer, this, cursor, mainPool);
-                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                    //attacks.get(0).deal();
-                }
-            }
-        }
-    }
+
 
     public boolean isSelected() {
         return selected;
@@ -222,10 +230,9 @@ public class Character extends Group implements Projectable, Attackable, Health,
         timeStamp = TimeUtils.millis();
         pathPoints = new LinkedList<>();
 
-        pathPoints.add(new Move(new Vector2(
+        pathPoints.add(new MoveAction(new Vector2(
                 getX() + getWidth() / 2,
                 getY() + getHeight() / 2), 0));
-        currentAction = 0;
         this.selected = selected;
         selection.setVisible(selected);
         selection.setColor(1,1,0,0.5f);
@@ -234,32 +241,34 @@ public class Character extends Group implements Projectable, Attackable, Health,
             attacks.forEach((attack -> attack.setSelected(false)));
         }
         try {
-            selectionListener.setSelected(selected);
+            poolListener.setSelected(selected);
         } catch (NullPointerException e){
             System.out.println("Selection listener is not set");
         }
     }
 
-    public void setSelectionListener(CharacterSelectionListener selectionListener) {
-        this.selectionListener = selectionListener;
+    public void setPoolListener(CharacterPoolListener poolListener) {
+        this.poolListener = poolListener;
         //Слушатель для выделения персонажа
         removeListener(getListeners().get(0));
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (!selectionListener.isSelected()) {
+                if (!poolListener.isSelected()) {
                     setSelected(!selected);
-                    System.out.println(selected);
-                    selectionListener.setSelected(selected);
-                    selectionListener.sendAttacks(attacks);
+                    System.out.println("Selected " + selected);
+                    poolListener.setSelected(selected);
+                    poolListener.sendAttacks(attacks);
                 }
                 return true;
             }
         });
     }
 
-
-
+    @Override
+    public Boolean isCollidable() {
+        return isCollidable;
+    }
 
     @Override
     public long getTimestamp() {
@@ -280,6 +289,10 @@ public class Character extends Group implements Projectable, Attackable, Health,
     public float getMaxAction() {
         return maxAction;
     }
+    @Override
+    public float getAvailableAction() {
+        return Math.min((maxAction-action),poolListener.getAvailableAction());
+    }
 
     @Override
     public float getAction() {
@@ -287,22 +300,13 @@ public class Character extends Group implements Projectable, Attackable, Health,
     }
 
     @Override
-    public void setAction(float action) {
-        this.action=action;
-    }
-
-    @Override
     public void addAction(float action) {
         this.action+=action;
+        poolListener.addAction(action);
     }
 
     @Override
-    public float getCurrentAction() {
-        return currentAction;
-    }
-
-    @Override
-    public LinkedList<Move> getPathPoints() {
+    public LinkedList<MoveAction> getPathPoints() {
         return pathPoints;
     }
 

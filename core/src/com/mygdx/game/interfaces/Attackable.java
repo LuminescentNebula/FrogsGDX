@@ -4,7 +4,7 @@ import com.mygdx.game.actions.Attack;
 
 import java.util.ArrayList;
 
-public interface Attackable extends Actionable{
+public interface Attackable extends Actionable,Placeable{
     ArrayList<Attack> getAttacks();
 
 }

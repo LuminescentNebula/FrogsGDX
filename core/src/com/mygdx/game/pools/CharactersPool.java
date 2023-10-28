@@ -4,32 +4,36 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.game.actions.Attack;
 import com.mygdx.game.actors.Character;
-import com.mygdx.game.interfaces.CharacterSelectionListener;
-import com.mygdx.game.interfaces.CharacterUIListener;
-import com.mygdx.game.interfaces.UICharacterListener;
+import com.mygdx.game.interfaces.*;
 
 import java.util.ArrayList;
 
-public class CharactersPool extends Pool<Character> implements CharacterSelectionListener,UICharacterListener {
+public class CharactersPool extends Pool<Character> implements ActionParentable,CharacterPoolListener,UICharacterListener {
     private final int ID_GROUP = 100;
     private boolean selected;
     private CharacterUIListener characterUIListener;
+    private Actionable actionMaster;
+
+    protected final int maxAction=2000;     //Максимальное действие, которе можно совершить за раунд
+    protected float action=0;               //Действие, которе было выполнено в текущем раунде
+    protected float currentAction;          //Действие, которое выполняется в текущем выделении персонажа
+
     //private int selected_id;
 
     public CharactersPool(){
         Character character1= new Character(actors.size()+ID_GROUP);
         character1.setPosition(200, 200);
-        character1.setSelectionListener(this);
+        character1.setPoolListener(this);
         addActor(character1);
 
         Character character2= new Character(actors.size()+ID_GROUP);
         character2.setPosition(400, 200);
-        character2.setSelectionListener(this);
+        character2.setPoolListener(this);
         addActor(character2);
 
         Character character3= new Character(actors.size()+ID_GROUP);
         character3.setPosition(500, 200);
-        character3.setSelectionListener(this);
+        character3.setPoolListener(this);
         addActor(character3);
     }
 
@@ -37,15 +41,29 @@ public class CharactersPool extends Pool<Character> implements CharacterSelectio
         this.characterUIListener=characterUIListener;
         characterUIListener.setSubscriber(this);
     }
+    @Override
+    public float getMaxAction() {
+        return Math.min((maxAction-action),actionMaster.getAvailableAction());
+    }
 
+    @Override
+    public float getAction() {
+        return action;
+    }
 
-//    public void project(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
-//        for (Character character: actors) {
-//            character.move(stage,shapeRenderer, mainPool);
-//        }
-//    }
+    @Override
+    public float getAvailableAction() {
+        return maxAction-action;
+    }
+    @Override
+    public void addAction(float action) {
+        this.action+=action;
+        actionMaster.addAction(action);
+    }
+
     @Override
     public void act(Stage stage, ShapeRenderer shapeRenderer,MainPool mainPool) {
+        //System.out.println("Pool action="+getAction());
         for (Character character: actors) {
             character.act(stage,shapeRenderer,mainPool);
             //Todo: после окончания selection не снимается
@@ -82,5 +100,8 @@ public class CharactersPool extends Pool<Character> implements CharacterSelectio
         }
     }
 
-
+    @Override
+    public void setActionMaster(Actionable actionMaster) {
+        this.actionMaster = actionMaster;
+    }
 }

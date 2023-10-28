@@ -2,24 +2,26 @@ package com.mygdx.game.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.mygdx.game.pools.MainPool;
-import com.mygdx.game.Move;
 import com.mygdx.game.interfaces.Collidable;
+import com.mygdx.game.pools.MainPool;
+import com.mygdx.game.MoveAction;
 import com.mygdx.game.interfaces.Health;
 import com.mygdx.game.interfaces.Movable;
 
 import java.util.LinkedList;
 
-public class Enemy extends Group implements Movable,Health {
+public class Enemy extends Group implements Movable, Collidable,Health {
 
     Rectangle bounds = new Rectangle();
     Image image;
-    private int ID;
+    private final int ID;
 
     private int health;
     private int maxHealth=100;
@@ -27,13 +29,26 @@ public class Enemy extends Group implements Movable,Health {
 
     protected final int maxAction=1000;
     protected float action=0;
-    protected float currentAction;
-    private LinkedList<Move> pathPoints;
+    private LinkedList<MoveAction> pathPoints;
 
+    //todo: Draw projection when character making multi point moving
     public Enemy(int ID){
         image = new Image(new Texture(Gdx.files.internal("ghost.png")));
         addActor(image);
         this.ID = ID;
+    }
+
+    @Override
+    public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
+        //move();
+    }
+    public void move(Vector2 cursor, Batch batch, ShapeRenderer shapeRenderer, MainPool mainPool){
+        //Projection.calculateProjection();
+    }
+
+    @Override
+    public void setSize(float width,float height){
+        image.setSize(width,height);
     }
 
     @Override
@@ -70,6 +85,11 @@ public class Enemy extends Group implements Movable,Health {
     @Override
     public Rectangle getBounds() {
         return bounds;
+    }
+
+    @Override
+    public Boolean isCollidable() {
+        return true;
     }
 
     @Override
@@ -114,13 +134,14 @@ public class Enemy extends Group implements Movable,Health {
     }
 
     @Override
-    public float getAction() {
-        return action;
+    public float getAvailableAction() {
+        //TODO
+        return 0;
     }
 
     @Override
-    public void setAction(float action) {
-        this.action=action;
+    public float getAction() {
+        return action;
     }
 
     @Override
@@ -129,12 +150,7 @@ public class Enemy extends Group implements Movable,Health {
     }
 
     @Override
-    public float getCurrentAction() {
-        return currentAction;
-    }
-
-    @Override
-    public LinkedList<Move> getPathPoints() {
+    public LinkedList<MoveAction> getPathPoints() {
         return pathPoints;
     }
 }

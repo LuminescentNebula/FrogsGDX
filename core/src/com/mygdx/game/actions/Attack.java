@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class Attack {
     private boolean isSelected=false;
     private Attackable master;
-
+    private float actionCost;
     private ArrayList<Type> types;
     boolean chainChecking = false; //Temporal while chain checking
 
@@ -47,11 +47,11 @@ public class Attack {
         }
     }
 
-//    private void deal(){
-//        for (Health target: targets) {
-//            target.dealHealth(damage);
-//        }
-//    }
+    public void deal(){
+        for (Type type: types) {
+            type.deal();
+        }
+    }
 
     public void draw(DrawInterface drawInterface, ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
@@ -102,5 +102,12 @@ public class Attack {
     }
     public void setMaster(Attackable master) {
         this.master = master;
+    }
+
+    public float getActionCost(){
+        return actionCost;
+    }
+    public void  setActionCost(float cost){
+        this.actionCost=cost;
     }
 }

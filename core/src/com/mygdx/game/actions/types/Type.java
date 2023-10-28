@@ -34,6 +34,13 @@ public class Type implements ActInterface, DrawInterface {
     public Type() {
 
     }
+
+    public void deal(){
+        for (Health target: targets){
+            target.dealHealth(damage);
+        }
+    }
+
     public Type setDraw(DrawInterface drawInterface){
         this.drawInterface = drawInterface;
         return this;

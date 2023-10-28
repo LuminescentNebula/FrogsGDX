@@ -48,14 +48,14 @@ public class Projection {
         }
 
         Vector2 direction = cursor.cpy().sub(projectable.getPathPoints().getLast().vector);
-        float restriction=Math.min(MAX_LINE_LENGTH, projectable.getMaxAction()- projectable.getAction()- projectable.getCurrentAction());
+        float restriction=Math.min(MAX_LINE_LENGTH, projectable.getAvailableAction());
         if (direction.len() > restriction) {
             direction.setLength(restriction);
             cursor.set(projectable.getPathPoints().getLast().vector.cpy().add(direction));
         }
-
-        calculateIntersection(projectable,mainPool, cursor);
-
+        if (projectable.isCollidable()) {
+            calculateIntersection(projectable, mainPool, cursor);
+        }
         shapeRenderer.rectLine(projectable.getPathPoints().getLast().vector,cursor, LINE_THICKNESS);
         transparentProjection(projectable,cursor,batch);
     }
@@ -67,16 +67,6 @@ public class Projection {
         batch.begin();
         projectable.getProjection().draw(batch,0.5f);
         batch.end();
-    }
-
-    public static boolean applyProjection(Projectable projectable){
-        projectable.addAction(projectable.getCurrentAction());
-        //System.out.println(projectable.getAction());
-        projectable.setPosition(
-                projectable.getPathPoints().getLast().vector.x - projectable.getWidth() / 2,
-                projectable.getPathPoints().getLast().vector.y - projectable.getHeight() / 2);
-        //projectable.setSelected(false);
-        return false;
     }
 
     public static boolean cancelProjection(Projectable projectable){
@@ -92,25 +82,28 @@ public class Projection {
 
     public static boolean calculateProjection(Vector2 cursor, Batch batch, ShapeRenderer shapeRenderer, Projectable projectable, MainPool mainPool, boolean shift) {
         float action = calculateAction(cursor, projectable);
-
         cursor.sub(projectable.getWidth() / 2, projectable.getHeight() / 2);
-
         if (shift) {
-            projectable.getPathPoints().add(new Move(
+            projectable.getPathPoints().add(new MoveAction(
                     projectable.getProjection().getX() + projectable.getWidth() / 2,
                     projectable.getProjection().getY() + projectable.getHeight() / 2,
                     action));
             //System.out.println(projectable.getPathPoints());
-            draw(cursor, batch, projectable, shapeRenderer, mainPool);
-
         } else {
-            projectable.addAction(projectable.getCurrentAction());
-            //System.out.println(projectable.getAction());
-            projectable.setPosition(projectable.getProjection().getX(), projectable.getProjection().getY());
-            //projectable.setSelected(false);
-            return false;
+            return applyProjection(projectable);
         }
         return true;
+    }
+
+    public static boolean applyProjection(Projectable projectable){
+        //projectable.addAction(projectable.getCurrentAction());
+        //System.out.println(projectable.getAction());
+        projectable.setPosition(projectable.getProjection().getX(), projectable.getProjection().getY());
+//        projectable.setPosition(
+//                projectable.getPathPoints().getLast().vector.x - projectable.getWidth() / 2,
+//                projectable.getPathPoints().getLast().vector.y - projectable.getHeight() / 2);
+        //projectable.setSelected(false);
+        return false;
     }
 
     private static float calculateAction(Vector2 cursor, Projectable projectable) {
@@ -125,11 +118,11 @@ public class Projection {
         Vector2 direction = cursor.cpy().sub(center);
         direction.limit(Projection.MAX_LINE_LENGTH);
         float n=0;
-        if (projectable.getAction() + projectable.getCurrentAction()+ direction.len() <= projectable.getMaxAction()) {
+        if (projectable.getAction() + direction.len() <= projectable.getMaxAction()) {
              n+= direction.len();
         } else {
-            direction.setLength(projectable.getMaxAction() - projectable.getAction() +-projectable.getCurrentAction());
-            n= projectable.getMaxAction() - projectable.getAction() +-projectable.getCurrentAction();
+            direction.setLength(projectable.getAvailableAction());
+            n= projectable.getAvailableAction();
         }
         projectable.addAction(n);
         cursor.set(center.cpy().add(direction));
