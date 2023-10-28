@@ -20,8 +20,14 @@ public class GameScreen implements Screen {
     private UserInterface UI;
 
     public GameScreen() {
-        stage = new Stage(new FitViewport(1024, 512)); //Размер viewport
-        Gdx.graphics.setWindowedMode(1024,512); //Размер окна
+        stage = new Stage(new FitViewport(1920, 1080)); //Размер viewport
+
+        Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode();
+        Gdx.graphics.setUndecorated(false);
+        Gdx.graphics.setResizable(true);
+        Gdx.graphics.setWindowedMode(displayMode.width/2,1000);
+        //Gdx.graphics.setWindowedMode(displayMode.width, displayMode.height);
+
         batch = new SpriteBatch();
         shapeRenderer =  new ShapeRenderer();
         shapeRenderer.setAutoShapeType(true);
@@ -29,16 +35,15 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         UI = new UserInterface();
-        UI.setBounds(0,0,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        UI.setBounds(0,stage.getHeight()-150, stage.getWidth(), stage.getHeight());
         UI.build();
 
         mainPool = new MainPool(UI);
 
-
         //Create images
-        background = new Image(new Texture(Gdx.files.internal("background.png")));
+        background = new Image(new Texture(Gdx.files.internal("CmBkMag.png")));
         background.setName("Background");
-
+        background.setFillParent(true);
 
         // Add actors to stage
         stage.addActor(background);
