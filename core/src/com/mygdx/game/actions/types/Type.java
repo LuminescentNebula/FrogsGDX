@@ -8,6 +8,7 @@ import com.mygdx.game.pools.MainPool;
 import com.mygdx.game.actions.types.mods.Mod;
 import com.mygdx.game.actions.types.mods.Reset;
 import com.mygdx.game.interfaces.*;
+import lombok.Getter;
 
 import java.util.*;
 
@@ -17,9 +18,13 @@ public class Type implements ActInterface, DrawInterface {
     //TODO: flags and other modificators
     LinkedList<Mod> mods = new LinkedList<>();
     Reset reset=new Reset(true);
-    private float minLength= Length.NONE,
-            maxLength= Length.LARGE,
-            radius= Radius.NONE;
+    @Getter
+    private float minLength= Length.NONE;
+    @Getter
+    private float maxLength= Length.LARGE;
+    @Getter
+    private float radius= Radius.NONE;
+    @Getter
     private int damage=0;
     private Set<Health> targets = new LinkedHashSet<>();
     //TODO:Not public
@@ -117,22 +122,6 @@ public class Type implements ActInterface, DrawInterface {
     }
     public void performAfter(Attackable master, Vector2 cursor, MainPool mainPool){
         reset.revert(cursor);
-    }
-
-    public float getMinLength() {
-        return minLength;
-    }
-
-    public float getMaxLength() {
-        return maxLength;
-    }
-
-    public float getRadius() {
-        return radius;
-    }
-
-    public int getDamage() {
-        return damage;
     }
 
     public Type setLength(float minLength, float maxLength){

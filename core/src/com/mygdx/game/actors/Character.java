@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.GameScreen;
 import com.mygdx.game.actions.types.mods.StopOnCollision;
 import com.mygdx.game.interfaces.*;
 import com.mygdx.game.pools.MainPool;
@@ -25,6 +26,7 @@ import com.mygdx.game.actions.types.Radius;
 import com.mygdx.game.actions.types.*;
 import com.mygdx.game.actions.types.mods.Reset;
 import com.mygdx.game.actions.types.mods.Rotate;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -43,7 +45,9 @@ public class Character extends Group implements Projectable, Attackable, Collida
     private int health;
     private int maxHealth=100;
     private boolean targeted=false;
+    @Getter
     private boolean selected=false;
+    @Getter
     private boolean attacking=false;
 
     private boolean isCollidable=true;

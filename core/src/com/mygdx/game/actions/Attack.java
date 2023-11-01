@@ -1,7 +1,6 @@
 package com.mygdx.game.actions;
 
 //TODO:Выделение всех затронутых персонажей и объектов
-//TODO:Трата действия персонажа
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -18,7 +17,6 @@ import com.mygdx.game.interfaces.Health;
 import java.util.*;
 import java.util.stream.Stream;
 
-//TODO:Настройки урона
 
 public class Attack {
     private boolean isSelected=false;

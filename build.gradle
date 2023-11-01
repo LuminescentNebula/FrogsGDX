@@ -12,13 +12,10 @@ buildscript {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
         classpath 'org.gretty:gretty:3.0.7'
         classpath 'com.android.tools.build:gradle:7.2.2'
-        
-
     }
 }
 
 allprojects {
-    apply plugin: "eclipse"
     version = '1.0'
     ext {
         appName = "My GDX Game"
@@ -96,6 +93,10 @@ project(":core") {
 
 
     dependencies {
+        implementation "com.mazatech.amanithsvg:amanithsvg-gdx:$amanithsvgVersion:natives-desktop"
+        compileOnly 'org.projectlombok:lombok:1.18.30'
+        annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "de.tomgrill.gdxdialogs:gdx-dialogs-core:1.3.0"
         api "com.kotcrab.vis:vis-ui:1.4.11"

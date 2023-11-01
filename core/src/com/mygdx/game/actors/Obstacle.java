@@ -3,7 +3,9 @@ package com.mygdx.game.actors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.mygdx.game.interfaces.ActionUpdatable;
 import com.mygdx.game.interfaces.Collidable;
 
 public class Obstacle extends Image implements Collidable {
