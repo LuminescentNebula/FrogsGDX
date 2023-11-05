@@ -6,16 +6,21 @@ import com.mygdx.game.actors.Obstacle;
 
 public class ObstaclesPool extends Pool<Obstacle> {
     private final int ID_GROUP = 300;
-
+    Obstacle obstacle;
     public ObstaclesPool(){
-        Obstacle obstacle = new Obstacle(actors.size()+ID_GROUP);
-        obstacle.setSize(50,50);
-        obstacle.setPosition(100,50);
+        obstacle = new Obstacle(actors.size()+ID_GROUP);
+        obstacle.setPosition(500,500);
         addActor(obstacle);
     }
 
     @Override
     public void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool) {
+
+        //obstacle.getCenter();
+    }
+
+    @Override
+    public void update(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool, float action) {
 
     }
 }

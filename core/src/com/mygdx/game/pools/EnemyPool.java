@@ -20,4 +20,9 @@ public class EnemyPool extends Pool<Enemy> {
             enemy.act(stage,shapeRenderer,mainPool);
         }
     }
+
+    @Override
+    public void update(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool, float action) {
+
+    }
 }

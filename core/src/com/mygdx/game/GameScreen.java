@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -21,14 +22,17 @@ public class GameScreen implements Screen {
     private MainPool mainPool;
     private UserInterface UI;
 
+    public static final int worldWidth=1920;
+    public static final int worldHeight=1080;
+
     public GameScreen() {
-        stage = new Stage(new FitViewport(1920, 1080)); //Размер viewport
+        stage = new Stage(new FitViewport(worldWidth, worldHeight)); //Размер viewport
 
         Graphics.DisplayMode displayMode = Gdx.graphics.getDisplayMode();
         Gdx.graphics.setUndecorated(false);
         Gdx.graphics.setResizable(true);
-        Gdx.graphics.setWindowedMode(displayMode.width/2,1000);
-        //Gdx.graphics.setWindowedMode(displayMode.width, displayMode.height);
+        Gdx.graphics.setFullscreenMode(displayMode);
+        Gdx.graphics.setWindowedMode(worldWidth/2, worldHeight/2);
 
         batch = new SpriteBatch();
         shapeRenderer =  new ShapeRenderer();

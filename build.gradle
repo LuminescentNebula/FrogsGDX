@@ -24,6 +24,7 @@ allprojects {
         box2DLightsVersion = '1.5'
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
+        amanithsvgVersion = '2.0.1'
         gdxControllersVersion = '2.2.1'
     }
 
@@ -47,7 +48,7 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "de.tomgrill.gdxdialogs:gdx-dialogs-desktop:1.3.0"
-        
+
     }
 }
 
@@ -58,6 +59,7 @@ project(":desktop") {
 //
 //    dependencies {
 //        implementation project(":core")
+//implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
 //        api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 //        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
 //        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
@@ -77,6 +79,8 @@ project(":html") {
 
     dependencies {
         implementation project(":core")
+        implementation "com.badlogicgames.ashley:ashley:$ashleyVersion:sources"
+
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
@@ -96,6 +100,7 @@ project(":core") {
         implementation "com.mazatech.amanithsvg:amanithsvg-gdx:$amanithsvgVersion:natives-desktop"
         compileOnly 'org.projectlombok:lombok:1.18.30'
         annotationProcessor 'org.projectlombok:lombok:1.18.30'
+        implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
 
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "de.tomgrill.gdxdialogs:gdx-dialogs-core:1.3.0"

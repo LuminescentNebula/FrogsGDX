@@ -34,6 +34,8 @@ public abstract class Pool<T> extends Group {
 
     public abstract void act(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool);
 
+    public abstract void update(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool,float action);
+
     public <E> ArrayList<E> get(Class<E> clazz) {
         return new ArrayList<E>() {{
             for (T actor : actors) {

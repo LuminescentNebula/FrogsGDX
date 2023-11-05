@@ -20,8 +20,13 @@ public class MainPool extends Pool<Pool> implements Actionable {
         charactersPool = new CharactersPool();
         charactersPool.setCharacterUIListener(uiListener);
         charactersPool.setActionMaster(this);
+
         obstaclesPool = new ObstaclesPool();
+
         enemyPool = new EnemyPool();
+
+
+
         addActor(charactersPool);
         addActor(obstaclesPool);
         addActor(enemyPool);
@@ -51,6 +56,17 @@ public class MainPool extends Pool<Pool> implements Actionable {
         act(stage,shapeRenderer);
     }
 
+    public void update(Stage stage, ShapeRenderer shapeRenderer) {
+        //TODO: action в праарметре
+        update(stage,shapeRenderer,this,action);
+    }
+
+    @Override
+    public void update(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool, float action) {
+        for (Pool pool : actors){
+            pool.update(stage,shapeRenderer,mainPool,action);
+        }
+    }
     public void act(Stage stage, ShapeRenderer shapeRenderer) {
         shapeRenderer.setProjectionMatrix(stage.getBatch().getProjectionMatrix());
         shapeRenderer.begin();
@@ -59,6 +75,7 @@ public class MainPool extends Pool<Pool> implements Actionable {
 
         for (Pool pool : actors){
             pool.act(stage,shapeRenderer,this);
+            pool.update(stage,shapeRenderer,this,action);
         }
 
 //        shapeRenderer.set(ShapeRenderer.ShapeType.Line);

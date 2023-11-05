@@ -77,15 +77,15 @@ public class Attack {
                     new Circle(cursor, radius)));
         }
 
-        if (type.flags.is(Flag.stopOnFirstCollision)) { //Если есть stop onFirstCollision, то добавляется только первая найденная цель
+        if (type.flags.is(Flag.stopOnFirst)) { //Если есть stop onFirstCollision, то добавляется только первая найденная цель
             stream = stream.sorted(Comparator.comparing(health -> health.getCenter().dst(master.getCenter())));
-            type.flags.del(Flag.stopOnFirstCollision);
+            type.flags.del(Flag.stopOnFirst);
             chainChecking=true;
             stream.findFirst().ifPresent(other -> { //Если есть chainDamage, то вызывается act, но с удаленным stopOnFirst и отметкой chainChecking, что идет проверка цепи
                 if (type.isAdd(other) && type.flags.is(Flag.chainDamage)) act(type, mainPool, shapeRenderer, master, other.getCenter(), radius);
             }); //Цепочка тоже начинается только от первой цели
             chainChecking=false;
-            type.flags.add(Flag.stopOnFirstCollision);
+            type.flags.add(Flag.stopOnFirst);
         } else {
             stream.forEach(other -> { //Цепочка начинается от каждой цели
                 if (type.isAdd(other) && type.flags.is(Flag.chainDamage)) {

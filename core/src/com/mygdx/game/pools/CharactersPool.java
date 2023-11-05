@@ -16,9 +16,6 @@ public class CharactersPool extends Pool<Character> implements ActionParentable,
 
     protected final int maxAction=2000;     //Максимальное действие, которе можно совершить за раунд
     protected float action=0;               //Действие, которе было выполнено в текущем раунде
-    protected float currentAction;          //Действие, которое выполняется в текущем выделении персонажа
-
-    //private int selected_id;
 
     public CharactersPool(){
         Character character1= new Character(actors.size()+ID_GROUP);
@@ -66,8 +63,14 @@ public class CharactersPool extends Pool<Character> implements ActionParentable,
         //System.out.println("Pool action="+getAction());
         for (Character character: actors) {
             character.act(stage,shapeRenderer,mainPool);
-            //Todo: после окончания selection не снимается
         }
+    }
+
+    @Override
+    public void update(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool, float action) {
+        for (ActionUpdatable character: get(ActionUpdatable.class)) {
+//            character.update(action);
+      }
     }
 
     @Override

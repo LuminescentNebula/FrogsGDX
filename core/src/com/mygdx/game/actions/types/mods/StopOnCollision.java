@@ -17,6 +17,7 @@ public class StopOnCollision implements Mod{
 
     }
 
+    //TODO: Исправить то, что останавливается перед коллизией (или не исправлять)
     private static void stopOnCollision(Vector2 vector,Attackable master, List<Collidable> healths){
         Vector2 intersection=new Vector2();
         AlignmentPack alignmentPack = new AlignmentPack();

@@ -1,5 +1,6 @@
 package com.mygdx.game.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -8,13 +9,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mygdx.game.interfaces.ActionUpdatable;
 import com.mygdx.game.interfaces.Collidable;
 
-public class Obstacle extends Image implements Collidable {
+public class Obstacle extends Group implements Collidable, ActionUpdatable {
 
-    private int ID;
+    private final int ID;
     Rectangle bounds = new Rectangle();
+    Image image;
+    float action;
+    float updateAction;
+
     public Obstacle(int ID) {
-        super(new Texture("badlogic.jpg"));
-        setSize(50,50);
+        image = new Image(new Texture("Ro.png"));
+        image.setSize(100,75);
+        addActor(image);
         this.ID = ID;
     }
 
@@ -39,6 +45,17 @@ public class Obstacle extends Image implements Collidable {
     }
 
     @Override
+    public float getWidth() {
+        return image.getWidth();
+    }
+
+    @Override
+    public float getHeight() {
+        return image.getHeight();
+    }
+
+
+    @Override
     public Rectangle getBounds() {
         return bounds;
     }
@@ -48,4 +65,23 @@ public class Obstacle extends Image implements Collidable {
         return ID;
     }
 
+    @Override
+    public Boolean isCollidable() {
+        return true;
+    }
+
+    @Override
+    public void addAction(float action) {
+        this.action+=action;
+        if (this.action>=updateAction){
+            this.action-=updateAction;
+            System.out.println(ID+" It is time for update");
+            //do something
+        }
+    }
+
+    @Override
+    public float getAction() {
+        return action;
+    }
 }

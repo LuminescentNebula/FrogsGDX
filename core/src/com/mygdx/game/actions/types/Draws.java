@@ -51,7 +51,7 @@ public abstract class Draws {
     public static void drawThroughShot(ShapeRenderer shapeRenderer, Vector2 master, Vector2 cursor, float minLength, float maxLength, float radius) {
         clamp(master,cursor,minLength,maxLength);
         Vector2 vec2 = new Vector2(cursor).sub(new Vector2(master));
-        //TODO:Костыль
+        //TODO:Костыль (Не до края экрана, а длина=диагонали
         vec2.clamp((float) Math.hypot(Gdx.graphics.getWidth(), Gdx.graphics.getWidth()), (float) Math.hypot(Gdx.graphics.getWidth(), Gdx.graphics.getWidth()));
         for (int i = 0; i <=20; i += 1) {
             shapeRenderer.circle(master.x + vec2.x*i/20, master.y + vec2.y*i/20, 5);

@@ -31,7 +31,9 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Character extends Group implements Projectable, Attackable, Collidable, Health, Selectable {
+
+public class Character extends Group implements Projectable, Attackable, Collidable, EnemyTargetable, Selectable {
+    private final int ID;
 
     private Image character,selection,characterProjection;
     public long timeStamp;
@@ -56,11 +58,6 @@ public class Character extends Group implements Projectable, Attackable, Collida
     private CharacterPoolListener poolListener;
 
     private Rectangle bounds = new Rectangle();
-    private final int ID;
-
-    public boolean isAttacking() {
-        return attacking;
-    }
 
     public void stopAttacking(){
         setAttacking(false,-1);
@@ -91,7 +88,7 @@ public class Character extends Group implements Projectable, Attackable, Collida
         character.setName("Character");
 
         //То, что появляется при выделении
-        //TODO: Зеленым при выделении и Красным при атаке
+        //TODO: Выделение
         selection = new Image(new Texture(Gdx.files.internal("selection.png")));
         selection.setSize(50, 100);
         selection.setVisible(false);
@@ -116,7 +113,7 @@ public class Character extends Group implements Projectable, Attackable, Collida
 
         for (int i=0;i<1;i+=1) {
             typeFabric.addType(new Type())
-                    .setDraw(Draws::drawShot)
+                    .setDraw(Draws::drawCatapult)
                     .addMod(new Rotate(45*i))
                     //.addMod(new Mirror(Mirror.MIRROR_X))
                     .addMod(new StopOnCollision())
@@ -127,11 +124,11 @@ public class Character extends Group implements Projectable, Attackable, Collida
 
                     .setAct(Acts::checkCircle)
                     .addFlag(Flag.checkNotMaster)
-                    //.addFlag(Flag.stopOnFirstCollision)
+                    .addFlag(Flag.stopOnFirst)
                     //.addFlag(Flag.chainDamage)
 
                     .setLength(0, 500)
-                    .setRadius(Radius.MEDIUM)
+                    .setRadius(Radius.NONE)
                     .setDamage(10);
         }
 
@@ -161,21 +158,27 @@ public class Character extends Group implements Projectable, Attackable, Collida
 
     public void move(Vector2 cursor, Batch batch, ShapeRenderer shapeRenderer, MainPool mainPool){
         boolean result=true;
-        System.out.println(action + " " +pathPoints);
+        //System.out.println(action + " " +pathPoints);
 
-        Projection.draw(cursor,batch, this, shapeRenderer, mainPool);
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            if ((cursor.y <= Gdx.graphics.getHeight() - 174) && isCursorValid(cursor)) { //TODO: Костыль для проверки, что нажатие в верхней части, где кнопки
+            if ((cursor.y <= GameScreen.worldHeight - 174) && isCursorValid(cursor)) { //TODO: Костыль для проверки, что нажатие в верхней части, где кнопки
+                Projection.draw(cursor,batch, this, shapeRenderer, mainPool);
                 result=Projection.calculateProjection(cursor, batch, shapeRenderer, this, mainPool,
                         Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT));
+            } else {
+                Projection.draw(cursor,batch, this, shapeRenderer, mainPool);
             }
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
-            result=Projection.applyProjection(this);
-        } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)){
-            result=Projection.cancelProjection(this);
+        } else {
+            Projection.draw(cursor,batch, this, shapeRenderer, mainPool);
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                result = Projection.applyProjection(this);
+            } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+                result = Projection.cancelProjection(this);
+            }
         }
+
         if (!result){
-            System.out.println(getAction());
+            System.out.println("Action = "+getAction());
             setSelected(false);
         }
     }
@@ -188,6 +191,7 @@ public class Character extends Group implements Projectable, Attackable, Collida
             attacks.get(activeAttack).check(shapeRenderer, this, cursor, mainPool);
             if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
                 //attacks.get(activeAttack).deal();
+                //TODO: проверить ограничение maxAction
                 addAction(attacks.get(activeAttack).getActionCost());
                 setSelected(!selected);
                 stopAttacking();
@@ -199,12 +203,6 @@ public class Character extends Group implements Projectable, Attackable, Collida
         return cursor.dst(getPathPoints().getFirst().vector) > Projection.MIN_DISTANCE &&
                 cursor.dst(getPathPoints().getLast().vector) > Projection.MIN_DISTANCE &&
                 Math.abs(getTimestamp() - TimeUtils.millis()) > Projection.MIN_TIME_DIFFERENCE;
-    }
-
-
-
-    public boolean isSelected() {
-        return selected;
     }
 
     @Override
@@ -239,7 +237,7 @@ public class Character extends Group implements Projectable, Attackable, Collida
                 getY() + getHeight() / 2), 0));
         this.selected = selected;
         selection.setVisible(selected);
-        selection.setColor(1,1,0,0.5f);
+        selection.setColor(0,1,0,0.5f);
         if (!selected) {
             attacking = false;
             attacks.forEach((attack -> attack.setSelected(false)));
