@@ -63,8 +63,8 @@ public class MainPool extends Pool<Pool> implements Actionable {
 
     @Override
     public void update(Stage stage, ShapeRenderer shapeRenderer, MainPool mainPool, float action) {
-        for (Pool pool : actors){
-            pool.update(stage,shapeRenderer,mainPool,action);
+        for (int i=0;i<actors.size();i++){
+            actors.get(i).update(stage,shapeRenderer,mainPool,action);
         }
     }
     public void act(Stage stage, ShapeRenderer shapeRenderer) {
@@ -72,10 +72,9 @@ public class MainPool extends Pool<Pool> implements Actionable {
         shapeRenderer.begin();
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.WHITE);
-
-        for (Pool pool : actors){
-            pool.act(stage,shapeRenderer,this);
-            pool.update(stage,shapeRenderer,this,action);
+        for (int i=0;i<actors.size();i++){
+            actors.get(i).act(stage,shapeRenderer,this);
+            actors.get(i).update(stage,shapeRenderer,this,action);
         }
 
 //        shapeRenderer.set(ShapeRenderer.ShapeType.Line);
@@ -94,8 +93,8 @@ public class MainPool extends Pool<Pool> implements Actionable {
 
     public <E> ArrayList<E> get(Class<E> clazz) {
         return new ArrayList<E>() {{
-            for (Pool pool : actors) {
-                addAll(pool.get(clazz));
+            for (int i=0;i<actors.size();i++){
+                addAll(actors.get(i).get(clazz));
             }
         }};
     };

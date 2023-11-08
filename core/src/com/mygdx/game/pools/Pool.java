@@ -38,9 +38,9 @@ public abstract class Pool<T> extends Group {
 
     public <E> ArrayList<E> get(Class<E> clazz) {
         return new ArrayList<E>() {{
-            for (T actor : actors) {
-                if (clazz.isInstance(actor)) {
-                    add((E) actor);
+            for (int i=0;i<actors.size();i++){
+                if (clazz.isInstance(actors.get(i))) {
+                    add((E) actors.get(i));
                 }
             }
         }};
