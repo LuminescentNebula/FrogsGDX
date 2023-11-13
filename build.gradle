@@ -33,6 +33,7 @@ allprojects {
         mavenCentral()
         google()
         gradlePluginPortal()
+        maven { url "https://mvnrepository.com/artifact/org.jgrapht/jgrapht"}
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
         maven { url "https://jitpack.io" }
@@ -98,6 +99,7 @@ project(":core") {
 
     dependencies {
         implementation "com.mazatech.amanithsvg:amanithsvg-gdx:$amanithsvgVersion:natives-desktop"
+        compileOnly  'org.jgrapht:jgrapht-core:1.1.0'
         compileOnly 'org.projectlombok:lombok:1.18.30'
         annotationProcessor 'org.projectlombok:lombok:1.18.30'
         implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
